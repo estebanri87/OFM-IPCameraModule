@@ -1,0 +1,157 @@
+#include "ReoLinkChannel.h"
+#include "knxprod.h"
+
+ReoLinkChannel::ReoLinkChannel(uint8_t channelIndex)
+    : BaseCameraChannel(channelIndex)
+{
+}
+
+void ReoLinkChannel::setup()
+{
+    // Base setup (polling interval, hold time)
+    BaseCameraChannel::setup();
+
+    // IP, user, password from ETS parameters
+    char ip[REOLINK_MAX_URL_LEN]   = {};
+    char user[REOLINK_MAX_USER_LEN] = {};
+    char pass[REOLINK_MAX_PASS_LEN] = {};
+
+    // ParamIPC_CHIpAddress / Username / Password are char arrays in knxprod.h
+    strncpy(ip,   ParamIPC_CHIpAddress, sizeof(ip)   - 1);
+    strncpy(user, ParamIPC_CHUsername,  sizeof(user) - 1);
+    strncpy(pass, ParamIPC_CHPassword,  sizeof(pass) - 1);
+
+    uint8_t nvrCh = 0;
+    _deviceType   = ParamIPC_CHDeviceType;
+    _connType     = ParamIPC_CHConnectionType;
+    _battery      = (ParamIPC_CHBattery != 0);
+    _hasChime     = (ParamIPC_CHHasChime != 0);
+
+    if (_deviceType == IPC_DEVICE_NVR)
+        nvrCh = ParamIPC_CHNvrChannelIndex;
+
+    _camera.setCredentials(ip, 80, user, pass, nvrCh);
+
+    logDebugP("ReoLink channel %d: ip=%s, device=%d, conn=%d, battery=%d, chime=%d",
+              _channelIndex, ip, _deviceType, _connType, (int)_battery, (int)_hasChime);
+}
+
+bool ReoLinkChannel::login()
+{
+    bool ok = _camera.login();
+    if (ok)
+        _lastTokenRefresh = millis();
+    return ok;
+}
+
+bool ReoLinkChannel::pollEvents()
+{
+    refreshTokenIfNeeded();
+
+    // Motion state
+    bool motion = false;
+    if (!_camera.getMdState(motion))
+        return false;
+
+    if (motion)
+    {
+        setKoBool(IPC_KoMotion, true);
+        _holdTimerMotion = millis();
+    }
+
+    // AI state
+    ReoLinkAiState ai;
+    if (!_camera.getAiState(ai))
+        return false;
+
+    applyAiState(ai);
+    updateAnyAlarm(ai, motion);
+
+    // Battery info (if applicable)
+    if (_battery)
+    {
+        int8_t level = -1, status = -1;
+        bool sleeping = false;
+        if (_camera.getBatteryInfo(level, status, sleeping))
+        {
+            if (level >= 0)
+            {
+                GroupObject& ko = openknx.getGroupObject(IPC_KoCalcNumber(_channelIndex, IPC_KoBatteryLevel));
+                ko.value((uint8_t)level, DPT_Scaling);
+            }
+            if (status >= 0)
+                setKoUint8(IPC_KoBatteryStatus, (uint8_t)status);
+            setKoBool(IPC_KoCameraSleeping, sleeping);
+        }
+    }
+
+    // WiFi signal (if applicable)
+    if (_connType == IPC_CONN_WLAN)
+    {
+        int8_t rssi = -100;
+        if (_camera.getWifiSignal(rssi))
+        {
+            GroupObject& ko = openknx.getGroupObject(IPC_KoCalcNumber(_channelIndex, IPC_KoWifiSignal));
+            ko.value((int16_t)rssi, DPT_Value_Electric_Current); // 9.021 dBm
+        }
+    }
+
+    return true;
+}
+
+void ReoLinkChannel::applyAiState(const ReoLinkAiState& ai)
+{
+    if (ai.person)  { setKoBool(IPC_KoPersonDetected,  true); _holdTimerPerson  = millis(); }
+    if (ai.vehicle) { setKoBool(IPC_KoVehicleDetected, true); _holdTimerVehicle = millis(); }
+    if (ai.animal)  { setKoBool(IPC_KoAnimalDetected,  true); _holdTimerAnimal  = millis(); }
+    if (ai.pet)     { setKoBool(IPC_KoPetDetected,     true); _holdTimerPet     = millis(); }
+    if (ai.package) { setKoBool(IPC_KoPackageDetected, true); _holdTimerPackage = millis(); }
+    if (ai.face)    { setKoBool(IPC_KoFaceDetected,    true); _holdTimerFace    = millis(); }
+    if (ai.baby)    { setKoBool(IPC_KoBabyAlarm,       true); _holdTimerBaby    = millis(); }
+    if (ai.ioAlarm) { setKoBool(IPC_KoIOAlarm,         true); _holdTimerIO      = millis(); }
+}
+
+void ReoLinkChannel::updateAnyAlarm(const ReoLinkAiState& ai, bool motion)
+{
+    bool any = motion || ai.person || ai.vehicle || ai.animal || ai.pet ||
+               ai.package || ai.face || ai.baby || ai.visitor || ai.ioAlarm;
+    if (any)
+    {
+        setKoBool(IPC_KoAnyAlarm, true);
+        _holdTimerAnyAlarm = millis();
+    }
+}
+
+void ReoLinkChannel::setKoUint8(uint8_t koIndex, uint8_t value)
+{
+    GroupObject& ko = openknx.getGroupObject(IPC_KoCalcNumber(_channelIndex, koIndex));
+    ko.value(value, DPT_SceneNumber);
+}
+
+void ReoLinkChannel::refreshTokenIfNeeded()
+{
+    if (!_camera.isLoggedIn())
+    {
+        logDebugP("ReoLink ch%d: token expired, re-login", _channelIndex);
+        _camera.login();
+    }
+}
+
+void ReoLinkChannel::setSiren(bool on)         { _camera.setSiren(on); }
+void ReoLinkChannel::setFloodlight(bool on)    { _camera.setFloodlight(on); }
+void ReoLinkChannel::setPrivacy(bool on)       { _camera.setPrivacy(on); }
+void ReoLinkChannel::setPush(bool on)          { _camera.setPush(on); }
+void ReoLinkChannel::setRecording(bool on)     { _camera.setRecording(on); }
+void ReoLinkChannel::setPtzPreset(uint8_t p)   { _camera.setPtzPreset(p); }
+void ReoLinkChannel::setIrLeds(bool on)        { _camera.setIrLeds(on); }
+void ReoLinkChannel::setDayNightMode(uint8_t m){ _camera.setDayNightMode(m); }
+void ReoLinkChannel::setMotionDetectActive(bool on) { _camera.setMotionDetect(on); }
+void ReoLinkChannel::setAutoTracking(bool on)  { _camera.setAutoTracking(on); }
+void ReoLinkChannel::setManualRecord(bool on)  { _camera.setRecording(on); }
+void ReoLinkChannel::setDoNotDisturb(bool on)  { _camera.setDoNotDisturb(on); }
+void ReoLinkChannel::setBellLedMode(uint8_t m) { _camera.setBellLedMode(m); }
+void ReoLinkChannel::setAutoReply(uint8_t i)   { _camera.setAutoReply(i); }
+void ReoLinkChannel::setChimeMute(bool m)      { _camera.setChimeMute(m); }
+void ReoLinkChannel::setChimeVolume(uint8_t v) { _camera.setChimeVolume(v); }
+void ReoLinkChannel::setChimeRingtone(uint8_t r){ _camera.setChimeRingtone(r); }
+void ReoLinkChannel::triggerChime()            { _camera.triggerChime(); }

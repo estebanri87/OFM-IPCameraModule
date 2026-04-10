@@ -1,0 +1,365 @@
+<?xml version="1.0" encoding="utf-8"?>
+<?xml-model href="../../Organization/knxprod-support/knx_project_14/knx-editor.xsd" type="application/xml" schematypens="http://www.w3.org/2001/XMLSchema"?>
+<KNX xmlns:op="http://github.com/OpenKNX/OpenKNXproducer" xmlns="http://knx.org/xml/project/14" CreatedBy="KNX MT" ToolVersion="5.1.255.16695">
+  <ManufacturerData>
+    <Manufacturer>
+      <ApplicationPrograms>
+        <ApplicationProgram>
+          <Static>
+            <Parameters>
+              <!-- Kanal-Bezeichnung -->
+              <Parameter Id="%AID%_P-%TT%%CC%000" Name="Channel%C%Name" ParameterType="%AID%_PT-Text40Byte" Text="Bezeichnung" Value="" />
+
+              <!-- Hersteller (Byte 0) -->
+              <Union SizeInBit="8">
+                <Memory CodeSegment="%MID%" Offset="0" BitOffset="0" />
+                <Parameter Id="%AID%_UP-%TT%%CC%001" Name="CH%C%Manufacturer" ParameterType="%AID%_PT-IPCManufacturer" Offset="0" BitOffset="0" Text="Hersteller" Value="0" />
+              </Union>
+
+              <!-- Gerätetyp (Byte 1) -->
+              <Union SizeInBit="8">
+                <Memory CodeSegment="%MID%" Offset="1" BitOffset="0" />
+                <Parameter Id="%AID%_UP-%TT%%CC%002" Name="CH%C%DeviceType" ParameterType="%AID%_PT-IPCDeviceType" Offset="0" BitOffset="0" Text="Gerätetyp" Value="0" />
+              </Union>
+
+              <!-- Verbindungstyp (Byte 2) -->
+              <Union SizeInBit="8">
+                <Memory CodeSegment="%MID%" Offset="2" BitOffset="0" />
+                <Parameter Id="%AID%_UP-%TT%%CC%003" Name="CH%C%ConnectionType" ParameterType="%AID%_PT-IPCConnType" Offset="0" BitOffset="0" Text="Verbindungstyp" Value="0" />
+              </Union>
+
+              <!-- Akkubetrieben (Byte 3) -->
+              <Union SizeInBit="8">
+                <Memory CodeSegment="%MID%" Offset="3" BitOffset="0" />
+                <Parameter Id="%AID%_UP-%TT%%CC%004" Name="CH%C%Battery" ParameterType="%AID%_PT-IPCYesNo" Offset="0" BitOffset="0" Text="Akkubetrieben" Value="0" />
+              </Union>
+
+              <!-- Chime vorhanden (Byte 4) -->
+              <Union SizeInBit="8">
+                <Memory CodeSegment="%MID%" Offset="4" BitOffset="0" />
+                <Parameter Id="%AID%_UP-%TT%%CC%005" Name="CH%C%HasChime" ParameterType="%AID%_PT-IPCYesNo" Offset="0" BitOffset="0" Text="Chime vorhanden" Value="0" />
+              </Union>
+
+              <!-- Polling-Intervall (Byte 5) -->
+              <Union SizeInBit="8">
+                <Memory CodeSegment="%MID%" Offset="5" BitOffset="0" />
+                <Parameter Id="%AID%_UP-%TT%%CC%006" Name="CH%C%PollingInterval" ParameterType="%AID%_PT-IPCPolling" Offset="0" BitOffset="0" Text="Polling-Intervall" Value="1" />
+              </Union>
+
+              <!-- Hold-Zeit Ereignis-KOs in Sekunden (Byte 6-7) -->
+              <Union SizeInBit="16">
+                <Memory CodeSegment="%MID%" Offset="6" BitOffset="0" />
+                <Parameter Id="%AID%_UP-%TT%%CC%007" Name="CH%C%HoldTime" ParameterType="%AID%_PT-IPCHoldTime" Offset="0" BitOffset="0" Text="Hold-Zeit Alarm-KOs (s)" Value="30" />
+              </Union>
+
+              <!-- NVR Kanal-Index (Byte 8) -->
+              <Union SizeInBit="8">
+                <Memory CodeSegment="%MID%" Offset="8" BitOffset="0" />
+                <Parameter Id="%AID%_UP-%TT%%CC%008" Name="CH%C%NvrChannelIndex" ParameterType="%AID%_PT-IPCNvrChannel" Offset="0" BitOffset="0" Text="NVR Kanal-Index (0-15)" Value="0" />
+              </Union>
+
+              <!-- IP-Adresse (Byte 9-88, 80 Zeichen) -->
+              <Union SizeInBit="640">
+                <Memory CodeSegment="%MID%" Offset="9" BitOffset="0" />
+                <Parameter Id="%AID%_UP-%TT%%CC%010" Name="CH%C%IpAddress" ParameterType="%AID%_PT-IPCString80" Offset="0" BitOffset="0" Text="IP-Adresse" Value="" />
+              </Union>
+
+              <!-- Benutzername (Byte 89-120, 32 Zeichen) -->
+              <Union SizeInBit="256">
+                <Memory CodeSegment="%MID%" Offset="89" BitOffset="0" />
+                <Parameter Id="%AID%_UP-%TT%%CC%011" Name="CH%C%Username" ParameterType="%AID%_PT-IPCString32" Offset="0" BitOffset="0" Text="Benutzername" Value="admin" />
+              </Union>
+
+              <!-- Passwort (Byte 121-152, 32 Zeichen) -->
+              <Union SizeInBit="256">
+                <Memory CodeSegment="%MID%" Offset="121" BitOffset="0" />
+                <Parameter Id="%AID%_UP-%TT%%CC%012" Name="CH%C%Password" ParameterType="%AID%_PT-IPCString32" Offset="0" BitOffset="0" Text="Passwort" Value="" />
+              </Union>
+            </Parameters>
+
+            <ParameterRefs>
+              <ParameterRef Id="%AID%_P-%TT%%CC%000_R-%TT%%CC%00001"  RefId="%AID%_P-%TT%%CC%000" />
+              <ParameterRef Id="%AID%_UP-%TT%%CC%001_R-%TT%%CC%00101" RefId="%AID%_UP-%TT%%CC%001" />
+              <ParameterRef Id="%AID%_UP-%TT%%CC%002_R-%TT%%CC%00201" RefId="%AID%_UP-%TT%%CC%002" />
+              <ParameterRef Id="%AID%_UP-%TT%%CC%003_R-%TT%%CC%00301" RefId="%AID%_UP-%TT%%CC%003" />
+              <ParameterRef Id="%AID%_UP-%TT%%CC%004_R-%TT%%CC%00401" RefId="%AID%_UP-%TT%%CC%004" />
+              <ParameterRef Id="%AID%_UP-%TT%%CC%005_R-%TT%%CC%00501" RefId="%AID%_UP-%TT%%CC%005" />
+              <ParameterRef Id="%AID%_UP-%TT%%CC%006_R-%TT%%CC%00601" RefId="%AID%_UP-%TT%%CC%006" />
+              <ParameterRef Id="%AID%_UP-%TT%%CC%007_R-%TT%%CC%00701" RefId="%AID%_UP-%TT%%CC%007" />
+              <ParameterRef Id="%AID%_UP-%TT%%CC%008_R-%TT%%CC%00801" RefId="%AID%_UP-%TT%%CC%008" />
+              <ParameterRef Id="%AID%_UP-%TT%%CC%010_R-%TT%%CC%01001" RefId="%AID%_UP-%TT%%CC%010" />
+              <ParameterRef Id="%AID%_UP-%TT%%CC%011_R-%TT%%CC%01101" RefId="%AID%_UP-%TT%%CC%011" />
+              <ParameterRef Id="%AID%_UP-%TT%%CC%012_R-%TT%%CC%01201" RefId="%AID%_UP-%TT%%CC%012" />
+            </ParameterRefs>
+
+            <ComObjectTable>
+              <!-- KO 0: Kamera erreichbar -->
+              <ComObject Id="%AID%_O-%TT%%CC%000" Number="%K0%"  Name="CH%C%Online"             Text="" ObjectSize="1 Bit"    DatapointType="DPST-1-1"   ReadFlag="Enabled"  WriteFlag="Disabled" CommunicationFlag="Enabled" TransmitFlag="Enabled"  UpdateFlag="Disabled" ReadOnInitFlag="Disabled" />
+              <!-- KO 1: Bewegung erkannt -->
+              <ComObject Id="%AID%_O-%TT%%CC%001" Number="%K1%"  Name="CH%C%Motion"             Text="" ObjectSize="1 Bit"    DatapointType="DPST-1-1"   ReadFlag="Enabled"  WriteFlag="Disabled" CommunicationFlag="Enabled" TransmitFlag="Enabled"  UpdateFlag="Disabled" ReadOnInitFlag="Disabled" />
+              <!-- KO 2: Alarm kombiniert -->
+              <ComObject Id="%AID%_O-%TT%%CC%002" Number="%K2%"  Name="CH%C%AnyAlarm"           Text="" ObjectSize="1 Bit"    DatapointType="DPST-1-1"   ReadFlag="Enabled"  WriteFlag="Disabled" CommunicationFlag="Enabled" TransmitFlag="Enabled"  UpdateFlag="Disabled" ReadOnInitFlag="Disabled" />
+              <!-- KO 3: Person erkannt -->
+              <ComObject Id="%AID%_O-%TT%%CC%003" Number="%K3%"  Name="CH%C%PersonDetected"     Text="" ObjectSize="1 Bit"    DatapointType="DPST-1-1"   ReadFlag="Enabled"  WriteFlag="Disabled" CommunicationFlag="Enabled" TransmitFlag="Enabled"  UpdateFlag="Disabled" ReadOnInitFlag="Disabled" />
+              <!-- KO 4: Fahrzeug erkannt -->
+              <ComObject Id="%AID%_O-%TT%%CC%004" Number="%K4%"  Name="CH%C%VehicleDetected"    Text="" ObjectSize="1 Bit"    DatapointType="DPST-1-1"   ReadFlag="Enabled"  WriteFlag="Disabled" CommunicationFlag="Enabled" TransmitFlag="Enabled"  UpdateFlag="Disabled" ReadOnInitFlag="Disabled" />
+              <!-- KO 5: Privacy-Modus -->
+              <ComObject Id="%AID%_O-%TT%%CC%005" Number="%K5%"  Name="CH%C%PrivacyMode"        Text="" ObjectSize="1 Bit"    DatapointType="DPST-1-1"   ReadFlag="Enabled"  WriteFlag="Enabled"  CommunicationFlag="Enabled" TransmitFlag="Enabled"  UpdateFlag="Disabled" ReadOnInitFlag="Disabled" />
+              <!-- KO 6: Aufzeichnung -->
+              <ComObject Id="%AID%_O-%TT%%CC%006" Number="%K6%"  Name="CH%C%Recording"          Text="" ObjectSize="1 Bit"    DatapointType="DPST-1-1"   ReadFlag="Disabled" WriteFlag="Enabled"  CommunicationFlag="Enabled" TransmitFlag="Disabled" UpdateFlag="Disabled" ReadOnInitFlag="Disabled" />
+              <!-- KO 7: Push-Benachrichtigungen -->
+              <ComObject Id="%AID%_O-%TT%%CC%007" Number="%K7%"  Name="CH%C%PushActive"         Text="" ObjectSize="1 Bit"    DatapointType="DPST-1-1"   ReadFlag="Enabled"  WriteFlag="Enabled"  CommunicationFlag="Enabled" TransmitFlag="Enabled"  UpdateFlag="Disabled" ReadOnInitFlag="Disabled" />
+              <!-- KO 8: Sirene -->
+              <ComObject Id="%AID%_O-%TT%%CC%008" Number="%K8%"  Name="CH%C%Siren"              Text="" ObjectSize="1 Bit"    DatapointType="DPST-1-1"   ReadFlag="Disabled" WriteFlag="Enabled"  CommunicationFlag="Enabled" TransmitFlag="Disabled" UpdateFlag="Disabled" ReadOnInitFlag="Disabled" />
+              <!-- KO 9: Flutlicht -->
+              <ComObject Id="%AID%_O-%TT%%CC%009" Number="%K9%"  Name="CH%C%Floodlight"         Text="" ObjectSize="1 Bit"    DatapointType="DPST-1-1"   ReadFlag="Disabled" WriteFlag="Enabled"  CommunicationFlag="Enabled" TransmitFlag="Disabled" UpdateFlag="Disabled" ReadOnInitFlag="Disabled" />
+              <!-- KO 10: Tier erkannt -->
+              <ComObject Id="%AID%_O-%TT%%CC%010" Number="%K10%" Name="CH%C%AnimalDetected"     Text="" ObjectSize="1 Bit"    DatapointType="DPST-1-1"   ReadFlag="Enabled"  WriteFlag="Disabled" CommunicationFlag="Enabled" TransmitFlag="Enabled"  UpdateFlag="Disabled" ReadOnInitFlag="Disabled" />
+              <!-- KO 11: Haustier erkannt -->
+              <ComObject Id="%AID%_O-%TT%%CC%011" Number="%K11%" Name="CH%C%PetDetected"        Text="" ObjectSize="1 Bit"    DatapointType="DPST-1-1"   ReadFlag="Enabled"  WriteFlag="Disabled" CommunicationFlag="Enabled" TransmitFlag="Enabled"  UpdateFlag="Disabled" ReadOnInitFlag="Disabled" />
+              <!-- KO 12: Paket erkannt -->
+              <ComObject Id="%AID%_O-%TT%%CC%012" Number="%K12%" Name="CH%C%PackageDetected"    Text="" ObjectSize="1 Bit"    DatapointType="DPST-1-1"   ReadFlag="Enabled"  WriteFlag="Disabled" CommunicationFlag="Enabled" TransmitFlag="Enabled"  UpdateFlag="Disabled" ReadOnInitFlag="Disabled" />
+              <!-- KO 13: Babyalarm -->
+              <ComObject Id="%AID%_O-%TT%%CC%013" Number="%K13%" Name="CH%C%BabyAlarm"          Text="" ObjectSize="1 Bit"    DatapointType="DPST-1-1"   ReadFlag="Enabled"  WriteFlag="Disabled" CommunicationFlag="Enabled" TransmitFlag="Enabled"  UpdateFlag="Disabled" ReadOnInitFlag="Disabled" />
+              <!-- KO 14: Gesicht erkannt -->
+              <ComObject Id="%AID%_O-%TT%%CC%014" Number="%K14%" Name="CH%C%FaceDetected"       Text="" ObjectSize="1 Bit"    DatapointType="DPST-1-1"   ReadFlag="Enabled"  WriteFlag="Disabled" CommunicationFlag="Enabled" TransmitFlag="Enabled"  UpdateFlag="Disabled" ReadOnInitFlag="Disabled" />
+              <!-- KO 15: IO-Eingang Alarm -->
+              <ComObject Id="%AID%_O-%TT%%CC%015" Number="%K15%" Name="CH%C%IOAlarm"            Text="" ObjectSize="1 Bit"    DatapointType="DPST-1-1"   ReadFlag="Enabled"  WriteFlag="Disabled" CommunicationFlag="Enabled" TransmitFlag="Enabled"  UpdateFlag="Disabled" ReadOnInitFlag="Disabled" />
+              <!-- KO 16: PTZ-Preset anfahren -->
+              <ComObject Id="%AID%_O-%TT%%CC%016" Number="%K16%" Name="CH%C%PtzPreset"          Text="" ObjectSize="1 Byte"   DatapointType="DPST-5-10"  ReadFlag="Disabled" WriteFlag="Enabled"  CommunicationFlag="Enabled" TransmitFlag="Disabled" UpdateFlag="Disabled" ReadOnInitFlag="Disabled" />
+              <!-- KO 17: Bewegungserkennung aktiv -->
+              <ComObject Id="%AID%_O-%TT%%CC%017" Number="%K17%" Name="CH%C%MotionDetectActive" Text="" ObjectSize="1 Bit"    DatapointType="DPST-1-1"   ReadFlag="Disabled" WriteFlag="Enabled"  CommunicationFlag="Enabled" TransmitFlag="Disabled" UpdateFlag="Disabled" ReadOnInitFlag="Disabled" />
+              <!-- KO 18: IR-LEDs -->
+              <ComObject Id="%AID%_O-%TT%%CC%018" Number="%K18%" Name="CH%C%IrLeds"             Text="" ObjectSize="1 Bit"    DatapointType="DPST-1-1"   ReadFlag="Disabled" WriteFlag="Enabled"  CommunicationFlag="Enabled" TransmitFlag="Disabled" UpdateFlag="Disabled" ReadOnInitFlag="Disabled" />
+              <!-- KO 19: Tag/Nacht-Zustand -->
+              <ComObject Id="%AID%_O-%TT%%CC%019" Number="%K19%" Name="CH%C%DayNightState"      Text="" ObjectSize="1 Byte"   DatapointType="DPST-5-10"  ReadFlag="Enabled"  WriteFlag="Disabled" CommunicationFlag="Enabled" TransmitFlag="Enabled"  UpdateFlag="Disabled" ReadOnInitFlag="Disabled" />
+              <!-- KO 20: Tag/Nacht-Modus -->
+              <ComObject Id="%AID%_O-%TT%%CC%020" Number="%K20%" Name="CH%C%DayNightMode"       Text="" ObjectSize="1 Byte"   DatapointType="DPST-5-10"  ReadFlag="Disabled" WriteFlag="Enabled"  CommunicationFlag="Enabled" TransmitFlag="Disabled" UpdateFlag="Disabled" ReadOnInitFlag="Disabled" />
+              <!-- KO 21: Auto-Tracking -->
+              <ComObject Id="%AID%_O-%TT%%CC%021" Number="%K21%" Name="CH%C%AutoTracking"       Text="" ObjectSize="1 Bit"    DatapointType="DPST-1-1"   ReadFlag="Disabled" WriteFlag="Enabled"  CommunicationFlag="Enabled" TransmitFlag="Disabled" UpdateFlag="Disabled" ReadOnInitFlag="Disabled" />
+              <!-- KO 22: Manuelle Aufnahme -->
+              <ComObject Id="%AID%_O-%TT%%CC%022" Number="%K22%" Name="CH%C%ManualRecord"       Text="" ObjectSize="1 Bit"    DatapointType="DPST-1-1"   ReadFlag="Disabled" WriteFlag="Enabled"  CommunicationFlag="Enabled" TransmitFlag="Disabled" UpdateFlag="Disabled" ReadOnInitFlag="Disabled" />
+              <!-- KO 23: Türklingel Auslöser -->
+              <ComObject Id="%AID%_O-%TT%%CC%023" Number="%K23%" Name="CH%C%DoorbellTrigger"    Text="" ObjectSize="1 Bit"    DatapointType="DPST-1-17"  ReadFlag="Enabled"  WriteFlag="Disabled" CommunicationFlag="Enabled" TransmitFlag="Enabled"  UpdateFlag="Disabled" ReadOnInitFlag="Disabled" />
+              <!-- KO 24: Türklingel gedrückt (Hold) -->
+              <ComObject Id="%AID%_O-%TT%%CC%024" Number="%K24%" Name="CH%C%DoorbellHold"       Text="" ObjectSize="1 Bit"    DatapointType="DPST-1-1"   ReadFlag="Enabled"  WriteFlag="Disabled" CommunicationFlag="Enabled" TransmitFlag="Enabled"  UpdateFlag="Disabled" ReadOnInitFlag="Disabled" />
+              <!-- KO 25: Nicht stören -->
+              <ComObject Id="%AID%_O-%TT%%CC%025" Number="%K25%" Name="CH%C%DoNotDisturb"       Text="" ObjectSize="1 Bit"    DatapointType="DPST-1-1"   ReadFlag="Disabled" WriteFlag="Enabled"  CommunicationFlag="Enabled" TransmitFlag="Disabled" UpdateFlag="Disabled" ReadOnInitFlag="Disabled" />
+              <!-- KO 26: Klingel-LED Modus -->
+              <ComObject Id="%AID%_O-%TT%%CC%026" Number="%K26%" Name="CH%C%BellLedMode"        Text="" ObjectSize="1 Byte"   DatapointType="DPST-5-10"  ReadFlag="Disabled" WriteFlag="Enabled"  CommunicationFlag="Enabled" TransmitFlag="Disabled" UpdateFlag="Disabled" ReadOnInitFlag="Disabled" />
+              <!-- KO 27: Auto-Reply Nachricht -->
+              <ComObject Id="%AID%_O-%TT%%CC%027" Number="%K27%" Name="CH%C%AutoReply"          Text="" ObjectSize="1 Byte"   DatapointType="DPST-5-10"  ReadFlag="Disabled" WriteFlag="Enabled"  CommunicationFlag="Enabled" TransmitFlag="Disabled" UpdateFlag="Disabled" ReadOnInitFlag="Disabled" />
+              <!-- KO 28: Chime stumm -->
+              <ComObject Id="%AID%_O-%TT%%CC%028" Number="%K28%" Name="CH%C%ChimeMute"          Text="" ObjectSize="1 Bit"    DatapointType="DPST-1-1"   ReadFlag="Disabled" WriteFlag="Enabled"  CommunicationFlag="Enabled" TransmitFlag="Disabled" UpdateFlag="Disabled" ReadOnInitFlag="Disabled" />
+              <!-- KO 29: Chime Lautstärke -->
+              <ComObject Id="%AID%_O-%TT%%CC%029" Number="%K29%" Name="CH%C%ChimeVolume"        Text="" ObjectSize="1 Byte"   DatapointType="DPST-5-10"  ReadFlag="Disabled" WriteFlag="Enabled"  CommunicationFlag="Enabled" TransmitFlag="Disabled" UpdateFlag="Disabled" ReadOnInitFlag="Disabled" />
+              <!-- KO 30: Chime Klingelton -->
+              <ComObject Id="%AID%_O-%TT%%CC%030" Number="%K30%" Name="CH%C%ChimeRingtone"      Text="" ObjectSize="1 Byte"   DatapointType="DPST-5-10"  ReadFlag="Disabled" WriteFlag="Enabled"  CommunicationFlag="Enabled" TransmitFlag="Disabled" UpdateFlag="Disabled" ReadOnInitFlag="Disabled" />
+              <!-- KO 31: Chime auslösen -->
+              <ComObject Id="%AID%_O-%TT%%CC%031" Number="%K31%" Name="CH%C%ChimeTrigger"       Text="" ObjectSize="1 Bit"    DatapointType="DPST-1-17"  ReadFlag="Disabled" WriteFlag="Enabled"  CommunicationFlag="Enabled" TransmitFlag="Disabled" UpdateFlag="Disabled" ReadOnInitFlag="Disabled" />
+              <!-- KO 32: Akkustand -->
+              <ComObject Id="%AID%_O-%TT%%CC%032" Number="%K32%" Name="CH%C%BatteryLevel"       Text="" ObjectSize="1 Byte"   DatapointType="DPST-5-1"   ReadFlag="Enabled"  WriteFlag="Disabled" CommunicationFlag="Enabled" TransmitFlag="Enabled"  UpdateFlag="Disabled" ReadOnInitFlag="Disabled" />
+              <!-- KO 33: Akku-Status -->
+              <ComObject Id="%AID%_O-%TT%%CC%033" Number="%K33%" Name="CH%C%BatteryStatus"      Text="" ObjectSize="1 Byte"   DatapointType="DPST-5-10"  ReadFlag="Enabled"  WriteFlag="Disabled" CommunicationFlag="Enabled" TransmitFlag="Enabled"  UpdateFlag="Disabled" ReadOnInitFlag="Disabled" />
+              <!-- KO 34: Kamera schläft -->
+              <ComObject Id="%AID%_O-%TT%%CC%034" Number="%K34%" Name="CH%C%CameraSleeping"     Text="" ObjectSize="1 Bit"    DatapointType="DPST-1-1"   ReadFlag="Enabled"  WriteFlag="Disabled" CommunicationFlag="Enabled" TransmitFlag="Enabled"  UpdateFlag="Disabled" ReadOnInitFlag="Disabled" />
+              <!-- KO 35: WiFi-Signalstärke -->
+              <ComObject Id="%AID%_O-%TT%%CC%035" Number="%K35%" Name="CH%C%WifiSignal"         Text="" ObjectSize="2 Bytes"  DatapointType="DPST-9-21"  ReadFlag="Enabled"  WriteFlag="Disabled" CommunicationFlag="Enabled" TransmitFlag="Enabled"  UpdateFlag="Disabled" ReadOnInitFlag="Disabled" />
+            </ComObjectTable>
+
+            <ComObjectRefs>
+              <!-- KO 0: Kamera erreichbar -->
+              <ComObjectRef Id="%AID%_O-%TT%%CC%000_R-%TT%%CC%00001" RefId="%AID%_O-%TT%%CC%000" Text="{{0:Kamera %C%}}: Kamera erreichbar"        FunctionText="Kamera %C%: Ausgang, Status"              TextParameterRefId="%AID%_P-%TT%%CC%000_R-%TT%%CC%00001" />
+              <!-- KO 1: Bewegung erkannt -->
+              <ComObjectRef Id="%AID%_O-%TT%%CC%001_R-%TT%%CC%00101" RefId="%AID%_O-%TT%%CC%001" Text="{{0:Kamera %C%}}: Bewegung erkannt"          FunctionText="Kamera %C%: Ausgang, Bewegung"            TextParameterRefId="%AID%_P-%TT%%CC%000_R-%TT%%CC%00001" />
+              <!-- KO 2: Alarm kombiniert -->
+              <ComObjectRef Id="%AID%_O-%TT%%CC%002_R-%TT%%CC%00201" RefId="%AID%_O-%TT%%CC%002" Text="{{0:Kamera %C%}}: Alarm (kombiniert)"        FunctionText="Kamera %C%: Ausgang, Alarm"               TextParameterRefId="%AID%_P-%TT%%CC%000_R-%TT%%CC%00001" />
+              <!-- KO 3: Person erkannt -->
+              <ComObjectRef Id="%AID%_O-%TT%%CC%003_R-%TT%%CC%00301" RefId="%AID%_O-%TT%%CC%003" Text="{{0:Kamera %C%}}: Person erkannt"            FunctionText="Kamera %C%: Ausgang, KI, Person"          TextParameterRefId="%AID%_P-%TT%%CC%000_R-%TT%%CC%00001" />
+              <!-- KO 4: Fahrzeug erkannt -->
+              <ComObjectRef Id="%AID%_O-%TT%%CC%004_R-%TT%%CC%00401" RefId="%AID%_O-%TT%%CC%004" Text="{{0:Kamera %C%}}: Fahrzeug erkannt"          FunctionText="Kamera %C%: Ausgang, KI, Fahrzeug"        TextParameterRefId="%AID%_P-%TT%%CC%000_R-%TT%%CC%00001" />
+              <!-- KO 5: Privacy-Modus -->
+              <ComObjectRef Id="%AID%_O-%TT%%CC%005_R-%TT%%CC%00501" RefId="%AID%_O-%TT%%CC%005" Text="{{0:Kamera %C%}}: Privacy-Modus"             FunctionText="Kamera %C%: Ein/Ausgang, Privacy"         TextParameterRefId="%AID%_P-%TT%%CC%000_R-%TT%%CC%00001" />
+              <!-- KO 6: Aufzeichnung -->
+              <ComObjectRef Id="%AID%_O-%TT%%CC%006_R-%TT%%CC%00601" RefId="%AID%_O-%TT%%CC%006" Text="{{0:Kamera %C%}}: Aufzeichnung"              FunctionText="Kamera %C%: Eingang, Aufzeichnung"        TextParameterRefId="%AID%_P-%TT%%CC%000_R-%TT%%CC%00001" />
+              <!-- KO 7: Push-Benachrichtigungen -->
+              <ComObjectRef Id="%AID%_O-%TT%%CC%007_R-%TT%%CC%00701" RefId="%AID%_O-%TT%%CC%007" Text="{{0:Kamera %C%}}: Push-Benachrichtigungen"   FunctionText="Kamera %C%: Ein/Ausgang, Push"            TextParameterRefId="%AID%_P-%TT%%CC%000_R-%TT%%CC%00001" />
+              <!-- KO 8: Sirene -->
+              <ComObjectRef Id="%AID%_O-%TT%%CC%008_R-%TT%%CC%00801" RefId="%AID%_O-%TT%%CC%008" Text="{{0:Kamera %C%}}: Sirene"                    FunctionText="Kamera %C%: Eingang, Sirene"              TextParameterRefId="%AID%_P-%TT%%CC%000_R-%TT%%CC%00001" />
+              <!-- KO 9: Flutlicht -->
+              <ComObjectRef Id="%AID%_O-%TT%%CC%009_R-%TT%%CC%00901" RefId="%AID%_O-%TT%%CC%009" Text="{{0:Kamera %C%}}: Flutlicht"                 FunctionText="Kamera %C%: Eingang, Flutlicht"           TextParameterRefId="%AID%_P-%TT%%CC%000_R-%TT%%CC%00001" />
+              <!-- KO 10: Tier erkannt -->
+              <ComObjectRef Id="%AID%_O-%TT%%CC%010_R-%TT%%CC%01001" RefId="%AID%_O-%TT%%CC%010" Text="{{0:Kamera %C%}}: Tier erkannt"              FunctionText="Kamera %C%: Ausgang, KI, Tier"            TextParameterRefId="%AID%_P-%TT%%CC%000_R-%TT%%CC%00001" />
+              <!-- KO 11: Haustier erkannt -->
+              <ComObjectRef Id="%AID%_O-%TT%%CC%011_R-%TT%%CC%01101" RefId="%AID%_O-%TT%%CC%011" Text="{{0:Kamera %C%}}: Haustier erkannt"          FunctionText="Kamera %C%: Ausgang, KI, Haustier"        TextParameterRefId="%AID%_P-%TT%%CC%000_R-%TT%%CC%00001" />
+              <!-- KO 12: Paket erkannt -->
+              <ComObjectRef Id="%AID%_O-%TT%%CC%012_R-%TT%%CC%01201" RefId="%AID%_O-%TT%%CC%012" Text="{{0:Kamera %C%}}: Paket erkannt"             FunctionText="Kamera %C%: Ausgang, KI, Paket"           TextParameterRefId="%AID%_P-%TT%%CC%000_R-%TT%%CC%00001" />
+              <!-- KO 13: Babyalarm -->
+              <ComObjectRef Id="%AID%_O-%TT%%CC%013_R-%TT%%CC%01301" RefId="%AID%_O-%TT%%CC%013" Text="{{0:Kamera %C%}}: Babyalarm"                 FunctionText="Kamera %C%: Ausgang, KI, Lärm"            TextParameterRefId="%AID%_P-%TT%%CC%000_R-%TT%%CC%00001" />
+              <!-- KO 14: Gesicht erkannt -->
+              <ComObjectRef Id="%AID%_O-%TT%%CC%014_R-%TT%%CC%01401" RefId="%AID%_O-%TT%%CC%014" Text="{{0:Kamera %C%}}: Gesicht erkannt"           FunctionText="Kamera %C%: Ausgang, KI, Gesicht"         TextParameterRefId="%AID%_P-%TT%%CC%000_R-%TT%%CC%00001" />
+              <!-- KO 15: IO-Eingang Alarm -->
+              <ComObjectRef Id="%AID%_O-%TT%%CC%015_R-%TT%%CC%01501" RefId="%AID%_O-%TT%%CC%015" Text="{{0:Kamera %C%}}: IO-Eingang Alarm"          FunctionText="Kamera %C%: Ausgang, IO"                  TextParameterRefId="%AID%_P-%TT%%CC%000_R-%TT%%CC%00001" />
+              <!-- KO 16: PTZ-Preset anfahren -->
+              <ComObjectRef Id="%AID%_O-%TT%%CC%016_R-%TT%%CC%01601" RefId="%AID%_O-%TT%%CC%016" Text="{{0:Kamera %C%}}: PTZ-Preset anfahren"       FunctionText="Kamera %C%: Eingang, PTZ"                 TextParameterRefId="%AID%_P-%TT%%CC%000_R-%TT%%CC%00001" />
+              <!-- KO 17: Bewegungserkennung aktiv -->
+              <ComObjectRef Id="%AID%_O-%TT%%CC%017_R-%TT%%CC%01701" RefId="%AID%_O-%TT%%CC%017" Text="{{0:Kamera %C%}}: Bewegungserkennung aktiv"  FunctionText="Kamera %C%: Eingang, Bewegungserkennung"  TextParameterRefId="%AID%_P-%TT%%CC%000_R-%TT%%CC%00001" />
+              <!-- KO 18: IR-LEDs -->
+              <ComObjectRef Id="%AID%_O-%TT%%CC%018_R-%TT%%CC%01801" RefId="%AID%_O-%TT%%CC%018" Text="{{0:Kamera %C%}}: IR-LEDs"                   FunctionText="Kamera %C%: Eingang, IR-LED"              TextParameterRefId="%AID%_P-%TT%%CC%000_R-%TT%%CC%00001" />
+              <!-- KO 19: Tag/Nacht-Zustand -->
+              <ComObjectRef Id="%AID%_O-%TT%%CC%019_R-%TT%%CC%01901" RefId="%AID%_O-%TT%%CC%019" Text="{{0:Kamera %C%}}: Tag/Nacht-Zustand"         FunctionText="Kamera %C%: Ausgang, Tag/Nacht"           TextParameterRefId="%AID%_P-%TT%%CC%000_R-%TT%%CC%00001" />
+              <!-- KO 20: Tag/Nacht-Modus -->
+              <ComObjectRef Id="%AID%_O-%TT%%CC%020_R-%TT%%CC%02001" RefId="%AID%_O-%TT%%CC%020" Text="{{0:Kamera %C%}}: Tag/Nacht-Modus"           FunctionText="Kamera %C%: Eingang, Tag/Nacht"           TextParameterRefId="%AID%_P-%TT%%CC%000_R-%TT%%CC%00001" />
+              <!-- KO 21: Auto-Tracking -->
+              <ComObjectRef Id="%AID%_O-%TT%%CC%021_R-%TT%%CC%02101" RefId="%AID%_O-%TT%%CC%021" Text="{{0:Kamera %C%}}: Auto-Tracking"             FunctionText="Kamera %C%: Eingang, Auto-Tracking"       TextParameterRefId="%AID%_P-%TT%%CC%000_R-%TT%%CC%00001" />
+              <!-- KO 22: Manuelle Aufnahme -->
+              <ComObjectRef Id="%AID%_O-%TT%%CC%022_R-%TT%%CC%02201" RefId="%AID%_O-%TT%%CC%022" Text="{{0:Kamera %C%}}: Manuelle Aufnahme"         FunctionText="Kamera %C%: Eingang, Aufnahme"            TextParameterRefId="%AID%_P-%TT%%CC%000_R-%TT%%CC%00001" />
+              <!-- KO 23: Türklingel Auslöser -->
+              <ComObjectRef Id="%AID%_O-%TT%%CC%023_R-%TT%%CC%02301" RefId="%AID%_O-%TT%%CC%023" Text="{{0:Kamera %C%}}: Türklingel Auslöser"       FunctionText="Kamera %C%: Ausgang, Türklingel, Auslöser" TextParameterRefId="%AID%_P-%TT%%CC%000_R-%TT%%CC%00001" />
+              <!-- KO 24: Türklingel gedrückt -->
+              <ComObjectRef Id="%AID%_O-%TT%%CC%024_R-%TT%%CC%02401" RefId="%AID%_O-%TT%%CC%024" Text="{{0:Kamera %C%}}: Türklingel gedrückt"       FunctionText="Kamera %C%: Ausgang, Türklingel, Status"  TextParameterRefId="%AID%_P-%TT%%CC%000_R-%TT%%CC%00001" />
+              <!-- KO 25: Nicht stören -->
+              <ComObjectRef Id="%AID%_O-%TT%%CC%025_R-%TT%%CC%02501" RefId="%AID%_O-%TT%%CC%025" Text="{{0:Kamera %C%}}: Nicht stören"              FunctionText="Kamera %C%: Eingang, Türklingel, DND"     TextParameterRefId="%AID%_P-%TT%%CC%000_R-%TT%%CC%00001" />
+              <!-- KO 26: Klingel-LED Modus -->
+              <ComObjectRef Id="%AID%_O-%TT%%CC%026_R-%TT%%CC%02601" RefId="%AID%_O-%TT%%CC%026" Text="{{0:Kamera %C%}}: Klingel-LED Modus"         FunctionText="Kamera %C%: Eingang, LED"                 TextParameterRefId="%AID%_P-%TT%%CC%000_R-%TT%%CC%00001" />
+              <!-- KO 27: Auto-Reply Nachricht -->
+              <ComObjectRef Id="%AID%_O-%TT%%CC%027_R-%TT%%CC%02701" RefId="%AID%_O-%TT%%CC%027" Text="{{0:Kamera %C%}}: Auto-Reply Nachricht"      FunctionText="Kamera %C%: Eingang, Auto-Reply"          TextParameterRefId="%AID%_P-%TT%%CC%000_R-%TT%%CC%00001" />
+              <!-- KO 28: Chime stumm -->
+              <ComObjectRef Id="%AID%_O-%TT%%CC%028_R-%TT%%CC%02801" RefId="%AID%_O-%TT%%CC%028" Text="{{0:Kamera %C%}}: Chime stumm"               FunctionText="Kamera %C%: Eingang, Chime, Stumm"        TextParameterRefId="%AID%_P-%TT%%CC%000_R-%TT%%CC%00001" />
+              <!-- KO 29: Chime Lautstärke -->
+              <ComObjectRef Id="%AID%_O-%TT%%CC%029_R-%TT%%CC%02901" RefId="%AID%_O-%TT%%CC%029" Text="{{0:Kamera %C%}}: Chime Lautstärke"          FunctionText="Kamera %C%: Eingang, Chime, Lautstärke"   TextParameterRefId="%AID%_P-%TT%%CC%000_R-%TT%%CC%00001" />
+              <!-- KO 30: Chime Klingelton -->
+              <ComObjectRef Id="%AID%_O-%TT%%CC%030_R-%TT%%CC%03001" RefId="%AID%_O-%TT%%CC%030" Text="{{0:Kamera %C%}}: Chime Klingelton"          FunctionText="Kamera %C%: Eingang, Chime, Klingelton"   TextParameterRefId="%AID%_P-%TT%%CC%000_R-%TT%%CC%00001" />
+              <!-- KO 31: Chime auslösen -->
+              <ComObjectRef Id="%AID%_O-%TT%%CC%031_R-%TT%%CC%03101" RefId="%AID%_O-%TT%%CC%031" Text="{{0:Kamera %C%}}: Chime auslösen"            FunctionText="Kamera %C%: Eingang, Chime, Auslöser"     TextParameterRefId="%AID%_P-%TT%%CC%000_R-%TT%%CC%00001" />
+              <!-- KO 32: Akkustand -->
+              <ComObjectRef Id="%AID%_O-%TT%%CC%032_R-%TT%%CC%03201" RefId="%AID%_O-%TT%%CC%032" Text="{{0:Kamera %C%}}: Akkustand"                 FunctionText="Kamera %C%: Ausgang, Akku, %"             TextParameterRefId="%AID%_P-%TT%%CC%000_R-%TT%%CC%00001" />
+              <!-- KO 33: Akku-Status -->
+              <ComObjectRef Id="%AID%_O-%TT%%CC%033_R-%TT%%CC%03301" RefId="%AID%_O-%TT%%CC%033" Text="{{0:Kamera %C%}}: Akku-Status"               FunctionText="Kamera %C%: Ausgang, Akku, Status"        TextParameterRefId="%AID%_P-%TT%%CC%000_R-%TT%%CC%00001" />
+              <!-- KO 34: Kamera schläft -->
+              <ComObjectRef Id="%AID%_O-%TT%%CC%034_R-%TT%%CC%03401" RefId="%AID%_O-%TT%%CC%034" Text="{{0:Kamera %C%}}: Kamera schläft"            FunctionText="Kamera %C%: Ausgang, Schlaf"              TextParameterRefId="%AID%_P-%TT%%CC%000_R-%TT%%CC%00001" />
+              <!-- KO 35: WiFi-Signalstärke -->
+              <ComObjectRef Id="%AID%_O-%TT%%CC%035_R-%TT%%CC%03501" RefId="%AID%_O-%TT%%CC%035" Text="{{0:Kamera %C%}}: WiFi-Signalstärke"         FunctionText="Kamera %C%: Ausgang, WiFi, dBm"           TextParameterRefId="%AID%_P-%TT%%CC%000_R-%TT%%CC%00001" />
+            </ComObjectRefs>
+          </Static>
+
+          <Dynamic>
+            <ChannelIndependentBlock>
+              <!-- Kanalanzahl steuert Sichtbarkeit -->
+              <choose ParamRefId="%AID%_UP-%TT%00000_R-%TT%0000001">
+                <when test="&gt;=%C%">
+                  <ParameterBlock Id="%AID%_PB-nnn" Name="f%CC%IPC" Text="Kamera %C%: {{0: ...}}" TextParameterRefId="%AID%_P-%TT%%CC%000_R-%TT%%CC%00001" Icon="camera-outline" ShowInComObjectTree="true" HelpContext="IPC-Channel">
+
+                    <ParameterSeparator Id="%AID%_PS-nnn" Text="Kamera %C%" UIHint="Headline" />
+                    <ParameterRefRef RefId="%AID%_P-%TT%%CC%000_R-%TT%%CC%00001" />
+                    <ParameterSeparator Id="%AID%_PS-nnn" Text="" UIHint="HorizontalRuler" />
+
+                    <!-- Gerät und Verbindung -->
+                    <ParameterSeparator Id="%AID%_PS-nnn" Text="Gerät" UIHint="Headline" />
+                    <ParameterRefRef RefId="%AID%_UP-%TT%%CC%001_R-%TT%%CC%00101" />
+                    <ParameterRefRef RefId="%AID%_UP-%TT%%CC%002_R-%TT%%CC%00201" />
+                    <ParameterRefRef RefId="%AID%_UP-%TT%%CC%003_R-%TT%%CC%00301" />
+                    <ParameterRefRef RefId="%AID%_UP-%TT%%CC%004_R-%TT%%CC%00401" />
+                    <!-- Chime nur bei Türklingel -->
+                    <choose ParamRefId="%AID%_UP-%TT%%CC%002_R-%TT%%CC%00201">
+                      <when test="=1">
+                        <ParameterRefRef RefId="%AID%_UP-%TT%%CC%005_R-%TT%%CC%00501" />
+                      </when>
+                    </choose>
+
+                    <!-- Verbindung -->
+                    <ParameterSeparator Id="%AID%_PS-nnn" Text="Verbindung" UIHint="Headline" />
+                    <ParameterRefRef RefId="%AID%_UP-%TT%%CC%010_R-%TT%%CC%01001" />
+                    <ParameterRefRef RefId="%AID%_UP-%TT%%CC%011_R-%TT%%CC%01101" />
+                    <ParameterRefRef RefId="%AID%_UP-%TT%%CC%012_R-%TT%%CC%01201" />
+                    <!-- NVR-Kanal-Index nur bei NVR -->
+                    <choose ParamRefId="%AID%_UP-%TT%%CC%002_R-%TT%%CC%00201">
+                      <when test="=2">
+                        <ParameterRefRef RefId="%AID%_UP-%TT%%CC%008_R-%TT%%CC%00801" />
+                      </when>
+                    </choose>
+
+                    <!-- Timing -->
+                    <ParameterSeparator Id="%AID%_PS-nnn" Text="Abfrage" UIHint="Headline" />
+                    <ParameterRefRef RefId="%AID%_UP-%TT%%CC%006_R-%TT%%CC%00601" />
+                    <ParameterRefRef RefId="%AID%_UP-%TT%%CC%007_R-%TT%%CC%00701" />
+
+                    <!-- Basis-KOs (immer sichtbar) -->
+                    <ParameterSeparator Id="%AID%_PS-nnn" Text="" UIHint="HorizontalRuler" />
+                    <ComObjectRefRef RefId="%AID%_O-%TT%%CC%000_R-%TT%%CC%00001" />
+                    <ComObjectRefRef RefId="%AID%_O-%TT%%CC%001_R-%TT%%CC%00101" />
+                    <ComObjectRefRef RefId="%AID%_O-%TT%%CC%002_R-%TT%%CC%00201" />
+                    <ComObjectRefRef RefId="%AID%_O-%TT%%CC%003_R-%TT%%CC%00301" />
+                    <ComObjectRefRef RefId="%AID%_O-%TT%%CC%004_R-%TT%%CC%00401" />
+                    <ComObjectRefRef RefId="%AID%_O-%TT%%CC%005_R-%TT%%CC%00501" />
+                    <ComObjectRefRef RefId="%AID%_O-%TT%%CC%006_R-%TT%%CC%00601" />
+                    <ComObjectRefRef RefId="%AID%_O-%TT%%CC%007_R-%TT%%CC%00701" />
+                    <ComObjectRefRef RefId="%AID%_O-%TT%%CC%008_R-%TT%%CC%00801" />
+                    <ComObjectRefRef RefId="%AID%_O-%TT%%CC%009_R-%TT%%CC%00901" />
+
+                    <!-- Kamera-spezifische KOs (nicht Türklingel) -->
+                    <choose ParamRefId="%AID%_UP-%TT%%CC%002_R-%TT%%CC%00201">
+                      <when test="!=1">
+                        <ComObjectRefRef RefId="%AID%_O-%TT%%CC%010_R-%TT%%CC%01001" />
+                        <ComObjectRefRef RefId="%AID%_O-%TT%%CC%011_R-%TT%%CC%01101" />
+                        <ComObjectRefRef RefId="%AID%_O-%TT%%CC%012_R-%TT%%CC%01201" />
+                        <ComObjectRefRef RefId="%AID%_O-%TT%%CC%013_R-%TT%%CC%01301" />
+                        <ComObjectRefRef RefId="%AID%_O-%TT%%CC%014_R-%TT%%CC%01401" />
+                        <ComObjectRefRef RefId="%AID%_O-%TT%%CC%015_R-%TT%%CC%01501" />
+                        <ComObjectRefRef RefId="%AID%_O-%TT%%CC%016_R-%TT%%CC%01601" />
+                        <ComObjectRefRef RefId="%AID%_O-%TT%%CC%017_R-%TT%%CC%01701" />
+                        <ComObjectRefRef RefId="%AID%_O-%TT%%CC%018_R-%TT%%CC%01801" />
+                        <ComObjectRefRef RefId="%AID%_O-%TT%%CC%019_R-%TT%%CC%01901" />
+                        <ComObjectRefRef RefId="%AID%_O-%TT%%CC%020_R-%TT%%CC%02001" />
+                        <ComObjectRefRef RefId="%AID%_O-%TT%%CC%021_R-%TT%%CC%02101" />
+                        <ComObjectRefRef RefId="%AID%_O-%TT%%CC%022_R-%TT%%CC%02201" />
+                      </when>
+                    </choose>
+
+                    <!-- Türklingel-spezifische KOs -->
+                    <choose ParamRefId="%AID%_UP-%TT%%CC%002_R-%TT%%CC%00201">
+                      <when test="=1">
+                        <ComObjectRefRef RefId="%AID%_O-%TT%%CC%023_R-%TT%%CC%02301" />
+                        <ComObjectRefRef RefId="%AID%_O-%TT%%CC%024_R-%TT%%CC%02401" />
+                        <ComObjectRefRef RefId="%AID%_O-%TT%%CC%025_R-%TT%%CC%02501" />
+                        <ComObjectRefRef RefId="%AID%_O-%TT%%CC%026_R-%TT%%CC%02601" />
+                        <ComObjectRefRef RefId="%AID%_O-%TT%%CC%027_R-%TT%%CC%02701" />
+                        <!-- Chime nur wenn vorhanden -->
+                        <choose ParamRefId="%AID%_UP-%TT%%CC%005_R-%TT%%CC%00501">
+                          <when test="=1">
+                            <ComObjectRefRef RefId="%AID%_O-%TT%%CC%028_R-%TT%%CC%02801" />
+                            <ComObjectRefRef RefId="%AID%_O-%TT%%CC%029_R-%TT%%CC%02901" />
+                            <ComObjectRefRef RefId="%AID%_O-%TT%%CC%030_R-%TT%%CC%03001" />
+                            <ComObjectRefRef RefId="%AID%_O-%TT%%CC%031_R-%TT%%CC%03101" />
+                          </when>
+                        </choose>
+                      </when>
+                    </choose>
+
+                    <!-- Akku-KOs (nur wenn Akkubetrieben = Ja) -->
+                    <choose ParamRefId="%AID%_UP-%TT%%CC%004_R-%TT%%CC%00401">
+                      <when test="=1">
+                        <ComObjectRefRef RefId="%AID%_O-%TT%%CC%032_R-%TT%%CC%03201" />
+                        <ComObjectRefRef RefId="%AID%_O-%TT%%CC%033_R-%TT%%CC%03301" />
+                        <ComObjectRefRef RefId="%AID%_O-%TT%%CC%034_R-%TT%%CC%03401" />
+                      </when>
+                    </choose>
+
+                    <!-- WiFi-KO (nur wenn Verbindungstyp = WLAN) -->
+                    <choose ParamRefId="%AID%_UP-%TT%%CC%003_R-%TT%%CC%00301">
+                      <when test="=1">
+                        <ComObjectRefRef RefId="%AID%_O-%TT%%CC%035_R-%TT%%CC%03501" />
+                      </when>
+                    </choose>
+
+                  </ParameterBlock>
+                </when>
+              </choose>
+            </ChannelIndependentBlock>
+          </Dynamic>
+
+        </ApplicationProgram>
+      </ApplicationPrograms>
+    </Manufacturer>
+  </ManufacturerData>
+</KNX>

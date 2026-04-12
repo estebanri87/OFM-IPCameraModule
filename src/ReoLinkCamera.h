@@ -3,8 +3,9 @@
 #include "HTTPClient.h"
 #include <ArduinoJson.h>
 
-#define REOLINK_HTTP_TIMEOUT_MS 8000
-#define REOLINK_MAX_URL_LEN     80
+#define REOLINK_HTTP_TIMEOUT_MS  8000
+#define REOLINK_MAX_URL_LEN      80
+#define IPC_TOKEN_REFRESH_MS     (55UL * 60UL * 1000UL)
 #define REOLINK_MAX_TOKEN_LEN   64
 #define REOLINK_MAX_USER_LEN    32
 #define REOLINK_MAX_PASS_LEN    32

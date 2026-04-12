@@ -12,6 +12,9 @@ class ReoLinkChannel : public BaseCameraChannel
     bool login() override;
     bool pollEvents() override;
 
+    // ONVIF event callback (ESP32 only)
+    void onOnvifEvent(const char* topic, bool state) override;
+
     void setSiren(bool on) override;
     void setFloodlight(bool on) override;
     void setPrivacy(bool on) override;

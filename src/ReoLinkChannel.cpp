@@ -17,14 +17,14 @@ void ReoLinkChannel::setup()
     char pass[REOLINK_MAX_PASS_LEN] = {};
 
     // ParamIPC_CHIpAddress / Username / Password are char arrays in knxprod.h
-    strncpy(ip,   ParamIPC_CHIpAddress, sizeof(ip)   - 1);
-    strncpy(user, ParamIPC_CHUsername,  sizeof(user) - 1);
-    strncpy(pass, ParamIPC_CHPassword,  sizeof(pass) - 1);
+    strncpy(ip,   (const char*)ParamIPC_CHIpAddress, sizeof(ip)   - 1);
+    strncpy(user, (const char*)ParamIPC_CHUsername,  sizeof(user) - 1);
+    strncpy(pass, (const char*)ParamIPC_CHPassword,  sizeof(pass) - 1);
 
     uint8_t nvrCh = 0;
     _deviceType   = ParamIPC_CHDeviceType;
     _connType     = ParamIPC_CHConnectionType;
-    _battery      = (ParamIPC_CHBattery != 0);
+    _battery      = (_connType == IPC_CONN_WLAN_BATTERY);
     _hasChime     = (ParamIPC_CHHasChime != 0);
 
     if (_deviceType == IPC_DEVICE_NVR)
@@ -76,7 +76,7 @@ bool ReoLinkChannel::pollEvents()
         {
             if (level >= 0)
             {
-                GroupObject& ko = openknx.getGroupObject(IPC_KoCalcNumber(_channelIndex, IPC_KoBatteryLevel));
+                GroupObject& ko = knx.getGroupObject(IPC_KoCalcNumber(IPC_KoBatteryLevel));
                 ko.value((uint8_t)level, DPT_Scaling);
             }
             if (status >= 0)
@@ -86,12 +86,12 @@ bool ReoLinkChannel::pollEvents()
     }
 
     // WiFi signal (if applicable)
-    if (_connType == IPC_CONN_WLAN)
+    if (_connType == IPC_CONN_WLAN || _connType == IPC_CONN_WLAN_BATTERY)
     {
         int8_t rssi = -100;
         if (_camera.getWifiSignal(rssi))
         {
-            GroupObject& ko = openknx.getGroupObject(IPC_KoCalcNumber(_channelIndex, IPC_KoWifiSignal));
+            GroupObject& ko = knx.getGroupObject(IPC_KoCalcNumber(IPC_KoWifiSignal));
             ko.value((int16_t)rssi, DPT_Value_Electric_Current); // 9.021 dBm
         }
     }
@@ -124,7 +124,7 @@ void ReoLinkChannel::updateAnyAlarm(const ReoLinkAiState& ai, bool motion)
 
 void ReoLinkChannel::setKoUint8(uint8_t koIndex, uint8_t value)
 {
-    GroupObject& ko = openknx.getGroupObject(IPC_KoCalcNumber(_channelIndex, koIndex));
+    GroupObject& ko = knx.getGroupObject(IPC_KoCalcNumber(koIndex));
     ko.value(value, DPT_SceneNumber);
 }
 
@@ -155,3 +155,48 @@ void ReoLinkChannel::setChimeMute(bool m)      { _camera.setChimeMute(m); }
 void ReoLinkChannel::setChimeVolume(uint8_t v) { _camera.setChimeVolume(v); }
 void ReoLinkChannel::setChimeRingtone(uint8_t r){ _camera.setChimeRingtone(r); }
 void ReoLinkChannel::triggerChime()            { _camera.triggerChime(); }
+
+void ReoLinkChannel::onOnvifEvent(const char* topic, bool state)
+{
+    // Map Reolink ONVIF topics to KOs
+    if (strstr(topic, "Visitor"))
+    {
+        if (state) { setKoBool(IPC_KoDoorbellTrigger, true); _holdTimerDoorbell = millis(); }
+    }
+    else if (strstr(topic, "Motion") || strstr(topic, "MotionAlarm"))
+    {
+        if (state) { setKoBool(IPC_KoMotion, true); _holdTimerMotion = millis(); }
+    }
+    else if (strstr(topic, "PeopleDetect") || strstr(topic, "FaceDetect"))
+    {
+        if (state) { setKoBool(IPC_KoPersonDetected, true); _holdTimerPerson = millis(); }
+    }
+    else if (strstr(topic, "VehicleDetect"))
+    {
+        if (state) { setKoBool(IPC_KoVehicleDetected, true); _holdTimerVehicle = millis(); }
+    }
+    else if (strstr(topic, "DogCatDetect"))
+    {
+        if (state) { setKoBool(IPC_KoAnimalDetected, true); _holdTimerAnimal = millis(); }
+    }
+    else if (strstr(topic, "Package"))
+    {
+        if (state) { setKoBool(IPC_KoPackageDetected, true); _holdTimerPackage = millis(); }
+    }
+    else if (strstr(topic, "Baby"))
+    {
+        if (state) { setKoBool(IPC_KoBabyAlarm, true); _holdTimerBaby = millis(); }
+    }
+    else if (strstr(topic, "IoAlarm") || strstr(topic, "IoDetect"))
+    {
+        if (state) { setKoBool(IPC_KoIOAlarm, true); _holdTimerIO = millis(); }
+    }
+
+    // AnyAlarm: fire on any true event
+    if (state)
+    {
+        setKoBool(IPC_KoAnyAlarm, true);
+        _holdTimerAnyAlarm = millis();
+        triggerSnapshot();
+    }
+}

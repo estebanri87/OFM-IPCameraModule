@@ -39,9 +39,11 @@ bool ReoLinkCamera::login()
     body[0]["param"]["User"]["password"] = _pass;
 
     JsonDocument resp;
-    // Login does not need token, call HTTP directly
-    char url[128];
-    buildBaseUrl(url, sizeof(url));
+    // Neuere Firmware: URL muss ?cmd=Login als Query-Parameter enthalten
+    char baseUrl[128];
+    buildBaseUrl(baseUrl, sizeof(baseUrl));
+    char url[160];
+    snprintf(url, sizeof(url), "%s?cmd=Login", baseUrl);
 
     std::string bodyStr;
     serializeJson(body, bodyStr);
@@ -49,12 +51,13 @@ bool ReoLinkCamera::login()
     HTTPClient* http = new HTTPClient();
     if (!http)
     {
-        logErrorP("ReoLink login: HTTPClient alloc failed");
+        logError("ReoLink", "login: HTTPClient alloc failed");
         return false;
     }
 
     http->begin(url);
     http->addHeader("Content-Type", "application/json");
+    http->setConnectTimeout(REOLINK_HTTP_TIMEOUT_MS);
     http->setTimeout(REOLINK_HTTP_TIMEOUT_MS);
 
     int code = http->POST(bodyStr.c_str());
@@ -72,21 +75,21 @@ bool ReoLinkCamera::login()
                 strncpy(_token, token, sizeof(_token) - 1);
                 _tokenTimestamp = millis();
                 success = true;
-                logDebugP("ReoLink login OK, token=%s", _token);
+                logDebug("ReoLink", "login OK, token=%s", _token);
             }
             else
             {
-                logErrorP("ReoLink login: no token in response");
+                logError("ReoLink", "login: no token in response");
             }
         }
         else
         {
-            logErrorP("ReoLink login: JSON parse error: %s", err.c_str());
+            logError("ReoLink", "login: JSON parse error: %s", err.c_str());
         }
     }
     else
     {
-        logErrorP("ReoLink login: HTTP %d", code);
+        logError("ReoLink", "login: HTTP %d", code);
     }
 
     http->end();
@@ -98,7 +101,7 @@ bool ReoLinkCamera::postCommand(const char* cmdName, JsonDocument& bodyDoc, Json
 {
     if (!isLoggedIn())
     {
-        logErrorP("ReoLink %s: not logged in", cmdName);
+        logError("ReoLink", "%s: not logged in", cmdName);
         return false;
     }
 
@@ -113,12 +116,13 @@ bool ReoLinkCamera::postCommand(const char* cmdName, JsonDocument& bodyDoc, Json
     HTTPClient* http = new HTTPClient();
     if (!http)
     {
-        logErrorP("ReoLink %s: HTTPClient alloc failed", cmdName);
+        logError("ReoLink", "%s: HTTPClient alloc failed", cmdName);
         return false;
     }
 
     http->begin(url);
     http->addHeader("Content-Type", "application/json");
+    http->setConnectTimeout(REOLINK_HTTP_TIMEOUT_MS);
     http->setTimeout(REOLINK_HTTP_TIMEOUT_MS);
 
     int code = http->POST(bodyStr.c_str());
@@ -130,9 +134,9 @@ bool ReoLinkCamera::postCommand(const char* cmdName, JsonDocument& bodyDoc, Json
         DeserializationError err = deserializeJson(responseDoc, payload);
         if (!err)
         {
-            // Check rspCode
+            // Reolink: code=0 = success (set), code=1 = success with value (get)
             int rspCode = responseDoc[0]["code"] | -1;
-            if (rspCode == 0)
+            if (rspCode == 0 || rspCode == 1)
             {
                 success = true;
             }
@@ -141,17 +145,17 @@ bool ReoLinkCamera::postCommand(const char* cmdName, JsonDocument& bodyDoc, Json
                 // Token may have expired
                 if (rspCode == -6 || rspCode == -7)
                     invalidateToken();
-                logErrorP("ReoLink %s: rspCode=%d", cmdName, rspCode);
+                logError("ReoLink", "%s: rspCode=%d", cmdName, rspCode);
             }
         }
         else
         {
-            logErrorP("ReoLink %s: JSON parse error: %s", cmdName, err.c_str());
+            logError("ReoLink", "%s: JSON parse error: %s", cmdName, err.c_str());
         }
     }
     else
     {
-        logErrorP("ReoLink %s: HTTP %d", cmdName, code);
+        logError("ReoLink", "%s: HTTP %d", cmdName, code);
     }
 
     http->end();

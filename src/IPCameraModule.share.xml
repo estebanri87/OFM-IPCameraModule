@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <?xml-model href="../../Organization/knxprod-support/knx_project_14/knx-editor.xsd" type="application/xml" schematypens="http://www.w3.org/2001/XMLSchema"?>
 <KNX xmlns:op="http://github.com/OpenKNX/OpenKNXproducer" xmlns="http://knx.org/xml/project/14" CreatedBy="KNX MT" ToolVersion="5.1.255.16695">
-  <op:config name="%IPC_NumChannelsDefault%" value="1" />
+  <op:config name="%IPC_NumChannelsDefault%" value="0" />
   <ManufacturerData>
     <Manufacturer>
       <ApplicationPrograms>
@@ -14,8 +14,8 @@
               <ParameterType Id="%AID%_PT-IPCManufacturer" Name="IPCManufacturer">
                 <TypeRestriction Base="Value" SizeInBit="8">
                   <Enumeration Text="Reolink"    Value="0" Id="%AID%_PT-IPCManufacturer_EN-0" />
-                  <Enumeration Text="Hikvision"  Value="1" Id="%AID%_PT-IPCManufacturer_EN-1" />
-                  <Enumeration Text="Dahua"      Value="2" Id="%AID%_PT-IPCManufacturer_EN-2" />
+                  <Enumeration Text="Hikvision (experimentell)"  Value="1" Id="%AID%_PT-IPCManufacturer_EN-1" />
+                  <Enumeration Text="Dahua (experimentell)"      Value="2" Id="%AID%_PT-IPCManufacturer_EN-2" />
                 </TypeRestriction>
               </ParameterType>
               <ParameterType Id="%AID%_PT-IPCDeviceType" Name="IPCDeviceType">
@@ -27,8 +27,9 @@
               </ParameterType>
               <ParameterType Id="%AID%_PT-IPCConnType" Name="IPCConnType">
                 <TypeRestriction Base="Value" SizeInBit="8">
-                  <Enumeration Text="PoE"  Value="0" Id="%AID%_PT-IPCConnType_EN-0" />
-                  <Enumeration Text="WLAN" Value="1" Id="%AID%_PT-IPCConnType_EN-1" />
+                  <Enumeration Text="LAN (PoE oder Netzteil)" Value="0" Id="%AID%_PT-IPCConnType_EN-0" />
+                  <Enumeration Text="WLAN (mit Netzteil)"     Value="1" Id="%AID%_PT-IPCConnType_EN-1" />
+                  <Enumeration Text="WLAN (Akku)"             Value="2" Id="%AID%_PT-IPCConnType_EN-2" />
                 </TypeRestriction>
               </ParameterType>
               <ParameterType Id="%AID%_PT-IPCYesNo" Name="IPCYesNo">
@@ -56,9 +57,52 @@
               </ParameterType>
               <ParameterType Id="%AID%_PT-IPCString32" Name="IPCString32">
                 <TypeText SizeInBit="256" />
+              </ParameterType>              <ParameterType Id="%AID%_PT-IPCString64" Name="IPCString64">      
+                <TypeText SizeInBit="512" />
               </ParameterType>
-            </ParameterTypes>
+              <ParameterType Id="%AID%_PT-IPCConnMode" Name="IPCConnMode">
+                <TypeRestriction Base="Value" SizeInBit="8">
+                  <Enumeration Text="JSON Polling"        Value="0" Id="%AID%_PT-IPCConnMode_EN-0" />
+                  <Enumeration Text="ONVIF Long Poll"     Value="1" Id="%AID%_PT-IPCConnMode_EN-1" />
+                  <Enumeration Text="ONVIF + JSON kombiniert" Value="2" Id="%AID%_PT-IPCConnMode_EN-2" />
+                </TypeRestriction>
+              </ParameterType>
+              <ParameterType Id="%AID%_PT-IPCPort" Name="IPCPort">
+                <TypeNumber SizeInBit="16" Type="unsignedInt" minInclusive="1" maxInclusive="65535" />
+              </ParameterType>            </ParameterTypes>
+            <Parameters>
+              <Union SizeInBit="8">
+                <Memory CodeSegment="%MID%" Offset="0" BitOffset="0" />
+                <Parameter Id="%AID%_UP-%TT%00000" Name="IPCVisibleChannels" ParameterType="%AID%_PT-IPCNumChannels" Offset="0" BitOffset="0" Text="Aktive Kameras" Value="%IPC_NumChannelsDefault%" SuffixText=" von %N%" />
+              </Union>
+            </Parameters>
+            <ParameterRefs>
+              <ParameterRef Id="%AID%_UP-%TT%00000_R-%TT%0000001" RefId="%AID%_UP-%TT%00000" />
+            </ParameterRefs>
+            <ComObjectTable />
+            <ComObjectRefs />
           </Static>
+          <Dynamic>
+            <Channel Name="MainChannel%TT%" Text="IP Kamera" Number="%PREFIX%" Id="%AID%_CH-%TT%" Icon="movie-open-outline">
+              <ParameterBlock Id="%AID%_PB-nnn" Name="IPCSettings" Text="Allgemein" Icon="cog-outline">
+                <ParameterSeparator Id="%AID%_PS-nnn" Text="IP Kamera" UIHint="Headline" />
+                <ParameterSeparator Id="%AID%_PS-nnn" Text="Version: %ModuleVersion%" />
+                <ParameterSeparator Id="%AID%_PS-nnn" Text="" UIHint="HorizontalRuler" />
+                <ParameterSeparator Id="%AID%_PS-nnn" Text="Kanalauswahl" UIHint="Headline" />
+                <ParameterRefRef IndentLevel="1" RefId="%AID%_UP-%TT%00000_R-%TT%0000001" />
+                <ParameterSeparator Id="%AID%_PS-nnn" Text="" UIHint="HorizontalRuler" />
+              </ParameterBlock>
+              <op:include href="IPCameraModule.templ.xml" xpath="//Dynamic/ChannelIndependentBlock/*" type="template" prefix="IPC" IsInner="true" />
+              <choose ParamRefId="%AID%_UP-%TT%00000_R-%TT%0000001">
+                <when test="&lt;%N%">
+                  <ParameterBlock Id="%AID%_PB-nnn" Name="IPCAdditionalChannels" Text="(mehr)" Icon="dots-horizontal">
+                    <ParameterSeparator Id="%AID%_PS-nnn" Text="Kanalauswahl" UIHint="Headline" />
+                    <ParameterRefRef RefId="%AID%_UP-%TT%00000_R-%TT%0000001" />
+                  </ParameterBlock>
+                </when>
+              </choose>
+            </Channel>
+          </Dynamic>
         </ApplicationProgram>
       </ApplicationPrograms>
     </Manufacturer>

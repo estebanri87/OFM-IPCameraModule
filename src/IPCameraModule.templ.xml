@@ -49,7 +49,7 @@
               <!-- Hold-Zeit Ereignis-KOs in Sekunden (Byte 6-7) -->
               <Union SizeInBit="16">
                 <Memory CodeSegment="%MID%" Offset="6" BitOffset="0" />
-                <Parameter Id="%AID%_UP-%TT%%CC%007" Name="CH%C%HoldTime" ParameterType="%AID%_PT-IPCHoldTime" Offset="0" BitOffset="0" Text="Hold-Zeit Alarm-KOs (s)" Value="30" />
+                <Parameter Id="%AID%_UP-%TT%%CC%007" Name="CH%C%HoldTime" ParameterType="%AID%_PT-IPCHoldTime" Offset="0" BitOffset="0" Text="Hold-Zeit Alarm-KOs" SuffixText="s" Value="30" />
               </Union>
 
               <!-- NVR Kanal-Index (Byte 8) -->
@@ -61,7 +61,7 @@
               <!-- IP-Adresse (Byte 9-88, 80 Zeichen) -->
               <Union SizeInBit="640">
                 <Memory CodeSegment="%MID%" Offset="9" BitOffset="0" />
-                <Parameter Id="%AID%_UP-%TT%%CC%010" Name="CH%C%IpAddress" ParameterType="%AID%_PT-IPCString80" Offset="0" BitOffset="0" Text="IP-Adresse" Value="" />
+                <Parameter Id="%AID%_UP-%TT%%CC%010" Name="CH%C%IpAddress" ParameterType="%AID%_PT-IPCString80" Offset="0" BitOffset="0" Text="IP-Adresse" Value="192.168.1.100" />
               </Union>
 
               <!-- Benutzername (Byte 89-120, 32 Zeichen) -->
@@ -74,6 +74,30 @@
               <Union SizeInBit="256">
                 <Memory CodeSegment="%MID%" Offset="121" BitOffset="0" />
                 <Parameter Id="%AID%_UP-%TT%%CC%012" Name="CH%C%Password" ParameterType="%AID%_PT-IPCString32" Offset="0" BitOffset="0" Text="Passwort" Value="" />
+              </Union>
+
+              <!-- Verbindungsmodus (Byte 153) -->
+              <Union SizeInBit="8">
+                <Memory CodeSegment="%MID%" Offset="153" BitOffset="0" />
+                <Parameter Id="%AID%_UP-%TT%%CC%013" Name="CH%C%ConnectionMode" ParameterType="%AID%_PT-IPCConnMode" Offset="0" BitOffset="0" Text="Verbindungsmodus" Value="0" />
+              </Union>
+
+              <!-- ONVIF-Port (Byte 154-155) -->
+              <Union SizeInBit="16">
+                <Memory CodeSegment="%MID%" Offset="154" BitOffset="0" />
+                <Parameter Id="%AID%_UP-%TT%%CC%014" Name="CH%C%OnvifPort" ParameterType="%AID%_PT-IPCPort" Offset="0" BitOffset="0" Text="ONVIF-Port" Value="80" />
+              </Union>
+
+              <!-- ONVIF-Pfad (Byte 156-219, 64 Zeichen) -->
+              <Union SizeInBit="512">
+                <Memory CodeSegment="%MID%" Offset="156" BitOffset="0" />
+                <Parameter Id="%AID%_UP-%TT%%CC%015" Name="CH%C%OnvifPath" ParameterType="%AID%_PT-IPCString64" Offset="0" BitOffset="0" Text="ONVIF-Dienstpfad" Value="/onvif/event_service" />
+              </Union>
+
+              <!-- Snapshot-URL (Byte 220-299, 80 Zeichen) -->
+              <Union SizeInBit="640">
+                <Memory CodeSegment="%MID%" Offset="220" BitOffset="0" />
+                <Parameter Id="%AID%_UP-%TT%%CC%016" Name="CH%C%SnapshotURL" ParameterType="%AID%_PT-IPCString80" Offset="0" BitOffset="0" Text="Snapshot-URL" Value="http://192.168.1.100/cgi-bin/api.cgi?cmd=Snap&amp;channel=0&amp;user=admin&amp;password=" />
               </Union>
             </Parameters>
 
@@ -90,6 +114,10 @@
               <ParameterRef Id="%AID%_UP-%TT%%CC%010_R-%TT%%CC%01001" RefId="%AID%_UP-%TT%%CC%010" />
               <ParameterRef Id="%AID%_UP-%TT%%CC%011_R-%TT%%CC%01101" RefId="%AID%_UP-%TT%%CC%011" />
               <ParameterRef Id="%AID%_UP-%TT%%CC%012_R-%TT%%CC%01201" RefId="%AID%_UP-%TT%%CC%012" />
+              <ParameterRef Id="%AID%_UP-%TT%%CC%013_R-%TT%%CC%01301" RefId="%AID%_UP-%TT%%CC%013" />
+              <ParameterRef Id="%AID%_UP-%TT%%CC%014_R-%TT%%CC%01401" RefId="%AID%_UP-%TT%%CC%014" />
+              <ParameterRef Id="%AID%_UP-%TT%%CC%015_R-%TT%%CC%01501" RefId="%AID%_UP-%TT%%CC%015" />
+              <ParameterRef Id="%AID%_UP-%TT%%CC%016_R-%TT%%CC%01601" RefId="%AID%_UP-%TT%%CC%016" />
             </ParameterRefs>
 
             <ComObjectTable>
@@ -165,6 +193,8 @@
               <ComObject Id="%AID%_O-%TT%%CC%034" Number="%K34%" Name="CH%C%CameraSleeping"     Text="" ObjectSize="1 Bit"    DatapointType="DPST-1-1"   ReadFlag="Enabled"  WriteFlag="Disabled" CommunicationFlag="Enabled" TransmitFlag="Enabled"  UpdateFlag="Disabled" ReadOnInitFlag="Disabled" />
               <!-- KO 35: WiFi-Signalstärke -->
               <ComObject Id="%AID%_O-%TT%%CC%035" Number="%K35%" Name="CH%C%WifiSignal"         Text="" ObjectSize="2 Bytes"  DatapointType="DPST-9-21"  ReadFlag="Enabled"  WriteFlag="Disabled" CommunicationFlag="Enabled" TransmitFlag="Enabled"  UpdateFlag="Disabled" ReadOnInitFlag="Disabled" />
+              <!-- KO 36: Snapshot-Auslöser -->
+              <ComObject Id="%AID%_O-%TT%%CC%036" Number="%K36%" Name="CH%C%SnapshotTrigger"    Text="" ObjectSize="1 Bit"    DatapointType="DPST-1-17"  ReadFlag="Disabled" WriteFlag="Disabled" CommunicationFlag="Enabled" TransmitFlag="Enabled"  UpdateFlag="Disabled" ReadOnInitFlag="Disabled" />
             </ComObjectTable>
 
             <ComObjectRefs>
@@ -240,6 +270,8 @@
               <ComObjectRef Id="%AID%_O-%TT%%CC%034_R-%TT%%CC%03401" RefId="%AID%_O-%TT%%CC%034" Text="{{0:Kamera %C%}}: Kamera schläft"            FunctionText="Kamera %C%: Ausgang, Schlaf"              TextParameterRefId="%AID%_P-%TT%%CC%000_R-%TT%%CC%00001" />
               <!-- KO 35: WiFi-Signalstärke -->
               <ComObjectRef Id="%AID%_O-%TT%%CC%035_R-%TT%%CC%03501" RefId="%AID%_O-%TT%%CC%035" Text="{{0:Kamera %C%}}: WiFi-Signalstärke"         FunctionText="Kamera %C%: Ausgang, WiFi, dBm"           TextParameterRefId="%AID%_P-%TT%%CC%000_R-%TT%%CC%00001" />
+              <!-- KO 36: Snapshot-Auslöser -->
+              <ComObjectRef Id="%AID%_O-%TT%%CC%036_R-%TT%%CC%03601" RefId="%AID%_O-%TT%%CC%036" Text="{{0:Kamera %C%}}: Snapshot auslösen"         FunctionText="Kamera %C%: Ausgang, Snapshot"            TextParameterRefId="%AID%_P-%TT%%CC%000_R-%TT%%CC%00001" />
             </ComObjectRefs>
           </Static>
 
@@ -248,7 +280,7 @@
               <!-- Kanalanzahl steuert Sichtbarkeit -->
               <choose ParamRefId="%AID%_UP-%TT%00000_R-%TT%0000001">
                 <when test="&gt;=%C%">
-                  <ParameterBlock Id="%AID%_PB-nnn" Name="f%CC%IPC" Text="Kamera %C%: {{0: ...}}" TextParameterRefId="%AID%_P-%TT%%CC%000_R-%TT%%CC%00001" Icon="camera-outline" ShowInComObjectTree="true" HelpContext="IPC-Channel">
+                  <ParameterBlock Id="%AID%_PB-nnn" Name="f%CC%IPC" Text="Kamera %C%: {{0: ...}}" TextParameterRefId="%AID%_P-%TT%%CC%000_R-%TT%%CC%00001" Icon="movie-open-outline" ShowInComObjectTree="true">
 
                     <ParameterSeparator Id="%AID%_PS-nnn" Text="Kamera %C%" UIHint="Headline" />
                     <ParameterRefRef RefId="%AID%_P-%TT%%CC%000_R-%TT%%CC%00001" />
@@ -259,7 +291,6 @@
                     <ParameterRefRef RefId="%AID%_UP-%TT%%CC%001_R-%TT%%CC%00101" />
                     <ParameterRefRef RefId="%AID%_UP-%TT%%CC%002_R-%TT%%CC%00201" />
                     <ParameterRefRef RefId="%AID%_UP-%TT%%CC%003_R-%TT%%CC%00301" />
-                    <ParameterRefRef RefId="%AID%_UP-%TT%%CC%004_R-%TT%%CC%00401" />
                     <!-- Chime nur bei Türklingel -->
                     <choose ParamRefId="%AID%_UP-%TT%%CC%002_R-%TT%%CC%00201">
                       <when test="=1">
@@ -278,6 +309,19 @@
                         <ParameterRefRef RefId="%AID%_UP-%TT%%CC%008_R-%TT%%CC%00801" />
                       </when>
                     </choose>
+
+                    <!-- Verbindungsmodus -->
+                    <ParameterSeparator Id="%AID%_PS-nnn" Text="ONVIF / Polling" UIHint="Headline" />
+                    <ParameterRefRef RefId="%AID%_UP-%TT%%CC%013_R-%TT%%CC%01301" />
+                    <!-- ONVIF-Details nur wenn ONVIF aktiv -->
+                    <choose ParamRefId="%AID%_UP-%TT%%CC%013_R-%TT%%CC%01301">
+                      <when test="!=0">
+                        <ParameterSeparator Id="%AID%_PS-nnn" Text="ONVIF erfordert ESP32 (FreeRTOS). Auf RP2040 bitte JSON Polling verwenden." UIHint="Information" />
+                        <ParameterRefRef RefId="%AID%_UP-%TT%%CC%014_R-%TT%%CC%01401" />
+                        <ParameterRefRef RefId="%AID%_UP-%TT%%CC%015_R-%TT%%CC%01501" />
+                      </when>
+                    </choose>
+                    <ParameterRefRef RefId="%AID%_UP-%TT%%CC%016_R-%TT%%CC%01601" />
 
                     <!-- Timing -->
                     <ParameterSeparator Id="%AID%_PS-nnn" Text="Abfrage" UIHint="Headline" />
@@ -336,21 +380,24 @@
                       </when>
                     </choose>
 
-                    <!-- Akku-KOs (nur wenn Akkubetrieben = Ja) -->
-                    <choose ParamRefId="%AID%_UP-%TT%%CC%004_R-%TT%%CC%00401">
-                      <when test="=1">
+<!-- Akku-KOs (nur wenn Verbindungstyp = WLAN Akku) -->
+                    <choose ParamRefId="%AID%_UP-%TT%%CC%003_R-%TT%%CC%00301">  
+                      <when test="=2">
                         <ComObjectRefRef RefId="%AID%_O-%TT%%CC%032_R-%TT%%CC%03201" />
                         <ComObjectRefRef RefId="%AID%_O-%TT%%CC%033_R-%TT%%CC%03301" />
                         <ComObjectRefRef RefId="%AID%_O-%TT%%CC%034_R-%TT%%CC%03401" />
                       </when>
                     </choose>
 
-                    <!-- WiFi-KO (nur wenn Verbindungstyp = WLAN) -->
-                    <choose ParamRefId="%AID%_UP-%TT%%CC%003_R-%TT%%CC%00301">
-                      <when test="=1">
+                    <!-- WiFi-KO (nur wenn Verbindungstyp = WLAN mit Netzteil oder Akku) -->
+                    <choose ParamRefId="%AID%_UP-%TT%%CC%003_R-%TT%%CC%00301">  
+                      <when test="&gt;=1">
                         <ComObjectRefRef RefId="%AID%_O-%TT%%CC%035_R-%TT%%CC%03501" />
                       </when>
                     </choose>
+
+                    <!-- Snapshot-Auslöser (immer sichtbar wenn Snapshot-URL konfiguriert) -->
+                    <ComObjectRefRef RefId="%AID%_O-%TT%%CC%036_R-%TT%%CC%03601" />
 
                   </ParameterBlock>
                 </when>

@@ -1,5 +1,7 @@
 #include "IPCameraModule.h"
 #include "ReoLinkChannel.h"
+#include "DahuaChannel.h"
+#include "HikvisionChannel.h"
 #include "knxprod.h"
 
 IPCameraModule openknxIPCameraModule;
@@ -29,11 +31,15 @@ void IPCameraModule::showInformations()
 
 OpenKNX::Channel* IPCameraModule::createChannel(uint8_t _channelIndex /* this parameter is used in macros, do not rename */)
 {
-    // Hersteller-Parameter: 0=Reolink, 1=Hikvision (future), 2=Dahua (future)
+    // Hersteller-Parameter: 0=Reolink, 1=Hikvision, 2=Dahua
     switch (ParamIPC_CHManufacturer)
     {
         case 0:
             return new ReoLinkChannel(_channelIndex);
+        case 1:
+            return new HikvisionChannel(_channelIndex);
+        case 2:
+            return new DahuaChannel(_channelIndex);
         default:
             logInfoP("IPC channel %d: unsupported manufacturer %d, disabled", _channelIndex, (int)ParamIPC_CHManufacturer);
             return nullptr;
@@ -63,26 +69,26 @@ bool IPCameraModule::processCommand(const std::string cmd, bool diagnoseKo)
     int chNum = atoi(channelStr.c_str());
     if (chNum < 1 || chNum > (int)IPC_ChannelCount)
     {
-        openknx.console.println("IPC: invalid channel number");
+        logInfo("IPC", "invalid channel number");
         return true;
     }
 
     auto* ch = static_cast<BaseCameraChannel*>(getChannel(chNum - 1));
     if (!ch)
     {
-        openknx.console.println("IPC: channel not active");
+        logInfo("IPC", "channel not active");
         return true;
     }
 
     if (subCmd == "login")
     {
         ch->login();
-        openknx.console.println("IPC: login triggered");
+        logInfo("IPC", "login triggered");
     }
     else if (subCmd == "poll")
     {
         ch->pollEvents();
-        openknx.console.println("IPC: poll triggered");
+        logInfo("IPC", "poll triggered");
     }
     else
     {

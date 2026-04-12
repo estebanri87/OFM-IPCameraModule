@@ -1,5 +1,6 @@
 #include "BaseCameraChannel.h"
 #include "knxprod.h"
+#include "NetworkModule.h"
 
 BaseCameraChannel::BaseCameraChannel(uint8_t channelIndex)
     : _channelIndex(channelIndex)
@@ -28,15 +29,68 @@ void BaseCameraChannel::setup()
     if (_holdTimeMs == 0)
         _holdTimeMs = IPC_HOLD_TIME_DEFAULT_MS;
 
+    // Verbindungsmodus (JSON / ONVIF / Combined)
+    _connectionMode = ParamIPC_CHConnectionMode;
+
+    // Kamera-Zugangsdaten cachen (für ONVIF)
+    strncpy(_camIp,   (const char*)ParamIPC_CHIpAddress, sizeof(_camIp)   - 1);
+    strncpy(_camUser, (const char*)ParamIPC_CHUsername,  sizeof(_camUser) - 1);
+    strncpy(_camPass, (const char*)ParamIPC_CHPassword,  sizeof(_camPass) - 1);
+
+#ifdef ARDUINO_ARCH_ESP32
+    if (_connectionMode >= IPC_MODE_ONVIF_ONLY)
+    {
+        _onvifPort = (uint16_t)ParamIPC_CHOnvifPort;
+        if (_onvifPort == 0) _onvifPort = 80;
+        const char* path = (const char*)ParamIPC_CHOnvifPath;
+        strncpy(_onvifPath, (path && path[0]) ? path : "/onvif/event_service",
+                sizeof(_onvifPath) - 1);
+    }
+#endif
+
     _startupDelay = millis();
-    logDebugP("IPC channel %d setup, poll=%lums, hold=%lums", _channelIndex, _pollIntervalMs, _holdTimeMs);
+    logDebugP("IPC channel %d setup, mode=%d poll=%lums, hold=%lums",
+              _channelIndex, _connectionMode, _pollIntervalMs, _holdTimeMs);
 }
 
 void BaseCameraChannel::loop()
 {
-    // Startup-Verzögerung
-    if (_firstPoll && (millis() - _startupDelay < IPC_STARTUP_DELAY_MS))
+    // Netzwerk muss verfügbar sein
+    if (!openknxNetwork.established())
         return;
+
+    // IP-Adresse muss konfiguriert sein
+    if (_camIp[0] == '\0')
+        return;
+
+    // Startup-Verzögerung (15s Basis + 5s * Kanal-Index, damit nicht alle gleichzeitig starten)
+    uint32_t startupDelay = IPC_STARTUP_DELAY_MS + (uint32_t)_channelIndex * IPC_STARTUP_STAGGER_MS;
+    if (_firstPoll && (millis() - _startupDelay < startupDelay))
+        return;
+
+#ifdef ARDUINO_ARCH_ESP32
+    // Start ONVIF task after startup delay (once)
+    if (_firstPoll && _connectionMode >= IPC_MODE_ONVIF_ONLY && _onvifTaskHandle == nullptr)
+        startOnvifTask();
+
+    // Process ONVIF events from queue (non-blocking)
+    if (_eventQueue != nullptr)
+    {
+        OnvifEvent ev;
+        while (xQueueReceive(_eventQueue, &ev, 0) == pdTRUE)
+        {
+            onOnvifEvent(ev.topic, ev.state);
+        }
+    }
+
+    // ONVIF-only mode: JSON polling disabled
+    if (_connectionMode == IPC_MODE_ONVIF_ONLY)
+    {
+        processHoldTimers();
+        _firstPoll = false;  // mark startup done
+        return;
+    }
+#endif
 
     // Polling-Intervall
     if (!_firstPoll && (millis() - _lastPoll < _pollIntervalMs))
@@ -133,7 +187,7 @@ void BaseCameraChannel::processInputKo(GroupObject& ko)
 
 void BaseCameraChannel::setKoBool(uint8_t koIndex, bool value)
 {
-    GroupObject& ko = openknx.getGroupObject(IPC_KoCalcNumber(_channelIndex, koIndex));
+    GroupObject& ko = knx.getGroupObject(IPC_KoCalcNumber(koIndex));
     bool current = (bool)ko.value(DPT_Switch);
     if (current != value)
         ko.value(value, DPT_Switch);
@@ -173,3 +227,86 @@ void BaseCameraChannel::setOnline(bool online)
         logDebugP("IPC channel %d: %s", _channelIndex, online ? "online" : "offline");
     }
 }
+
+void BaseCameraChannel::triggerSnapshot()
+{
+    setKoBool(IPC_KoSnapshotTrigger, true);
+    // Single-shot: immediately clear (no hold timer — receiver should latch)
+    setKoBool(IPC_KoSnapshotTrigger, false);
+}
+
+#ifdef ARDUINO_ARCH_ESP32
+void BaseCameraChannel::startOnvifTask()
+{
+    _eventQueue = xQueueCreate(16, sizeof(OnvifEvent));
+    if (!_eventQueue)
+    {
+        logErrorP("IPC ch%d: failed to create ONVIF event queue", _channelIndex);
+        return;
+    }
+    char taskName[20];
+    snprintf(taskName, sizeof(taskName), "onvif_%d", _channelIndex);
+    BaseType_t res = xTaskCreate(
+        onvifTaskFunc,
+        taskName,
+        8192 + 2048,  // stack size (needs room for 1500-byte SOAP buffers)
+        this,
+        1,      // priority
+        &_onvifTaskHandle
+    );
+    if (res != pdPASS)
+    {
+        logErrorP("IPC ch%d: failed to create ONVIF task", _channelIndex);
+        _onvifTaskHandle = nullptr;
+    }
+}
+
+void BaseCameraChannel::onvifTaskBody()
+{
+    // Wait a bit before first connect to let the network come up
+    vTaskDelay(pdMS_TO_TICKS(5000));
+
+    while (true)
+    {
+        if (!_onvifClient.isSubscribed())
+        {
+            logInfoP("ONVIF ch%d: subscribing...", _channelIndex);
+            bool ok = _onvifClient.subscribe(_camIp, _onvifPort, _onvifPath,
+                                             _camUser, _camPass);
+            if (!ok)
+            {
+                logInfoP("ONVIF ch%d: subscribe failed, retry in 15s", _channelIndex);
+                vTaskDelay(pdMS_TO_TICKS(15000));
+                continue;
+            }
+            logInfoP("ONVIF ch%d: subscribed OK", _channelIndex);
+            setOnline(true);
+        }
+
+        // Renew subscription before it expires
+        int32_t remaining = _onvifClient.renewTimerMs();
+        if (remaining >= 0 && remaining < (int32_t)ONVIF_RENEW_THRESHOLD_MS)
+        {
+            logInfoP("ONVIF ch%d: renewing subscription", _channelIndex);
+            _onvifClient.renew();
+        }
+
+        // Blocking pull (up to 5 minutes)
+        OnvifEventList evts;
+        bool ok = _onvifClient.pullMessages(evts);
+        if (!ok)
+        {
+            logInfoP("ONVIF ch%d: pullMessages failed, re-subscribing", _channelIndex);
+            setOnline(false);
+            vTaskDelay(pdMS_TO_TICKS(5000));
+            continue;
+        }
+
+        for (uint8_t i = 0; i < evts.count; i++)
+        {
+            if (_eventQueue)
+                xQueueSend(_eventQueue, &evts.events[i], pdMS_TO_TICKS(100));
+        }
+    }
+}
+#endif

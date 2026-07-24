@@ -369,8 +369,10 @@ void OnvifClient::parsePullResponse(const char* xml, OnvifEventList& out)
         if (!nm) break;
         ptr = nm + 1;
 
-        // Find Topic
-        const char* topicStart = strstr(nm, "<Topic");
+        // Find Topic. The element carries a namespace prefix (<wsnt:Topic>),
+        // so match the element name itself instead of the literal "<Topic".
+        // "topicExpression" in the Dialect attribute is lower-case and safe.
+        const char* topicStart = strstr(nm, "Topic");
         if (!topicStart) continue;
         const char* topicContent = strchr(topicStart, '>');
         if (!topicContent) continue;

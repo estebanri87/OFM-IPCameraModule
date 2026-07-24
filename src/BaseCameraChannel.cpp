@@ -36,6 +36,7 @@ void BaseCameraChannel::setup()
     strncpy(_camIp,   (const char*)ParamIPC_CHIpAddress, sizeof(_camIp)   - 1);
     strncpy(_camUser, (const char*)ParamIPC_CHUsername,  sizeof(_camUser) - 1);
     strncpy(_camPass, (const char*)ParamIPC_CHPassword,  sizeof(_camPass) - 1);
+    strncpy(_snapshotUrl, (const char*)ParamIPC_CHSnapshotURL, sizeof(_snapshotUrl) - 1);
 
 #ifdef ARDUINO_ARCH_ESP32
     if (_connectionMode >= IPC_MODE_ONVIF_ONLY)
@@ -144,8 +145,8 @@ void BaseCameraChannel::processInputKo(GroupObject& ko)
         case IPC_KoPtzPreset:
             setPtzPreset((uint8_t)KoIPC_CHPtzPreset.value(DPT_SceneNumber));
             break;
-        case IPC_KoMotionDetectActive:
-            setMotionDetectActive((bool)KoIPC_CHMotionDetectActive.value(DPT_Switch));
+        case IPC_KoMotionSensitivity:
+            setMotionSensitivity((uint8_t)KoIPC_CHMotionSensitivity.value(DPT_Scaling));
             break;
         case IPC_KoIrLeds:
             setIrLeds((bool)KoIPC_CHIrLeds.value(DPT_Switch));
@@ -163,7 +164,7 @@ void BaseCameraChannel::processInputKo(GroupObject& ko)
             setDoNotDisturb((bool)KoIPC_CHDoNotDisturb.value(DPT_Switch));
             break;
         case IPC_KoBellLedMode:
-            setBellLedMode((uint8_t)KoIPC_CHBellLedMode.value(DPT_SceneNumber));
+            setBellLedMode((bool)KoIPC_CHBellLedMode.value(DPT_Switch));
             break;
         case IPC_KoAutoReply:
             setAutoReply((uint8_t)KoIPC_CHAutoReply.value(DPT_SceneNumber));
@@ -233,6 +234,28 @@ void BaseCameraChannel::triggerSnapshot()
     setKoBool(IPC_KoSnapshotTrigger, true);
     // Single-shot: immediately clear (no hold timer — receiver should latch)
     setKoBool(IPC_KoSnapshotTrigger, false);
+
+    if (_snapshotUrl[0] == '\0')
+        return;
+
+    // Fire-and-forget: die Antwort (typisch ein JPEG) wird verworfen, nur der
+    // Aufruf zählt — z.B. als Webhook oder um einen Upload der Kamera anzustoßen.
+    HTTPClient http;
+    if (!http.begin(_snapshotUrl))
+    {
+        logErrorP("IPC ch%d: Snapshot-URL ungültig", _channelIndex);
+        return;
+    }
+    http.setConnectTimeout(IPC_SNAPSHOT_TIMEOUT_MS);
+    http.setTimeout(IPC_SNAPSHOT_TIMEOUT_MS);
+
+    int code = http.GET();
+    if (code <= 0)
+        logErrorP("IPC ch%d: Snapshot fehlgeschlagen (%d)", _channelIndex, code);
+    else
+        logDebugP("IPC ch%d: Snapshot ausgelöst, HTTP %d", _channelIndex, code);
+
+    http.end();
 }
 
 #ifdef ARDUINO_ARCH_ESP32

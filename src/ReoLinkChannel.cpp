@@ -30,10 +30,13 @@ void ReoLinkChannel::setup()
     if (_deviceType == IPC_DEVICE_NVR)
         nvrCh = ParamIPC_CHNvrChannelIndex;
 
-    _camera.setCredentials(ip, 80, user, pass, nvrCh);
+    uint16_t port = (uint16_t)ParamIPC_CHHttpPort;
+    if (port == 0) port = 80;
 
-    logDebugP("ReoLink channel %d: ip=%s, device=%d, conn=%d, battery=%d, chime=%d",
-              _channelIndex, ip, _deviceType, _connType, (int)_battery, (int)_hasChime);
+    _camera.setCredentials(ip, port, user, pass, nvrCh);
+
+    logDebugP("ReoLink channel %d: ip=%s:%u, device=%d, conn=%d, battery=%d, chime=%d",
+              _channelIndex, ip, port, _deviceType, _connType, (int)_battery, (int)_hasChime);
 }
 
 bool ReoLinkChannel::login()
@@ -42,6 +45,15 @@ bool ReoLinkChannel::login()
     if (ok)
         _lastTokenRefresh = millis();
     return ok;
+}
+
+bool ReoLinkChannel::queryAbility(uint8_t& featureBits, uint8_t& aiBits)
+{
+    // Der Assistent läuft unabhängig vom Polling-Zustand, daher hier ein eigener Login
+    if (!_camera.isLoggedIn() && !_camera.login())
+        return false;
+
+    return _camera.getAbility(featureBits, aiBits);
 }
 
 bool ReoLinkChannel::pollEvents()
@@ -88,11 +100,12 @@ bool ReoLinkChannel::pollEvents()
     // WiFi signal (if applicable)
     if (_connType == IPC_CONN_WLAN || _connType == IPC_CONN_WLAN_BATTERY)
     {
-        int8_t rssi = -100;
-        if (_camera.getWifiSignal(rssi))
+        int8_t signal = -1;
+        if (_camera.getWifiSignal(signal) && signal >= 0)
         {
+            // TODO: Wert ist 0..100, KO 35 ist in der ETS noch als DPT 9.021 (mA) angelegt
             GroupObject& ko = knx.getGroupObject(IPC_KoCalcNumber(IPC_KoWifiSignal));
-            ko.value((int16_t)rssi, DPT_Value_Electric_Current); // 9.021 dBm
+            ko.value((int16_t)signal, DPT_Value_Electric_Current);
         }
     }
 
@@ -117,8 +130,12 @@ void ReoLinkChannel::updateAnyAlarm(const ReoLinkAiState& ai, bool motion)
                ai.package || ai.face || ai.baby || ai.visitor || ai.ioAlarm;
     if (any)
     {
+        // Snapshot nur bei der steigenden Flanke, nicht in jedem Poll-Zyklus
+        bool wasIdle = (_holdTimerAnyAlarm == 0);
         setKoBool(IPC_KoAnyAlarm, true);
         _holdTimerAnyAlarm = millis();
+        if (wasIdle)
+            triggerSnapshot();
     }
 }
 
@@ -145,11 +162,11 @@ void ReoLinkChannel::setRecording(bool on)     { _camera.setRecording(on); }
 void ReoLinkChannel::setPtzPreset(uint8_t p)   { _camera.setPtzPreset(p); }
 void ReoLinkChannel::setIrLeds(bool on)        { _camera.setIrLeds(on); }
 void ReoLinkChannel::setDayNightMode(uint8_t m){ _camera.setDayNightMode(m); }
-void ReoLinkChannel::setMotionDetectActive(bool on) { _camera.setMotionDetect(on); }
+void ReoLinkChannel::setMotionSensitivity(uint8_t p) { _camera.setMotionSensitivity(p); }
 void ReoLinkChannel::setAutoTracking(bool on)  { _camera.setAutoTracking(on); }
 void ReoLinkChannel::setManualRecord(bool on)  { _camera.setRecording(on); }
 void ReoLinkChannel::setDoNotDisturb(bool on)  { _camera.setDoNotDisturb(on); }
-void ReoLinkChannel::setBellLedMode(uint8_t m) { _camera.setBellLedMode(m); }
+void ReoLinkChannel::setBellLedMode(bool on)   { _camera.setBellLedMode(on); }
 void ReoLinkChannel::setAutoReply(uint8_t i)   { _camera.setAutoReply(i); }
 void ReoLinkChannel::setChimeMute(bool m)      { _camera.setChimeMute(m); }
 void ReoLinkChannel::setChimeVolume(uint8_t v) { _camera.setChimeVolume(v); }
@@ -195,8 +212,10 @@ void ReoLinkChannel::onOnvifEvent(const char* topic, bool state)
     // AnyAlarm: fire on any true event
     if (state)
     {
+        bool wasIdle = (_holdTimerAnyAlarm == 0);
         setKoBool(IPC_KoAnyAlarm, true);
         _holdTimerAnyAlarm = millis();
-        triggerSnapshot();
+        if (wasIdle)
+            triggerSnapshot();
     }
 }

@@ -10,6 +10,7 @@ class ReoLinkChannel : public BaseCameraChannel
     void setup() override;
 
     bool login() override;
+    bool queryAbility(uint8_t& featureBits, uint8_t& aiBits) override;
     bool pollEvents() override;
 
     // ONVIF event callback (ESP32 only)
@@ -23,11 +24,11 @@ class ReoLinkChannel : public BaseCameraChannel
     void setPtzPreset(uint8_t preset) override;
     void setIrLeds(bool on) override;
     void setDayNightMode(uint8_t mode) override;
-    void setMotionDetectActive(bool on) override;
+    void setMotionSensitivity(uint8_t percent) override;
     void setAutoTracking(bool on) override;
     void setManualRecord(bool on) override;
     void setDoNotDisturb(bool on) override;
-    void setBellLedMode(uint8_t mode) override;
+    void setBellLedMode(bool on) override;
     void setAutoReply(uint8_t index) override;
     void setChimeMute(bool muted) override;
     void setChimeVolume(uint8_t volume) override;

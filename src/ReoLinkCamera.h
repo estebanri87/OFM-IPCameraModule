@@ -9,6 +9,13 @@
 #define REOLINK_MAX_TOKEN_LEN   64
 #define REOLINK_MAX_USER_LEN    32
 #define REOLINK_MAX_PASS_LEN    32
+#define REOLINK_MAX_CHIME_NAME  32
+
+// DingDongOpt-Optionen (aus reolink_aio, am Gerät verifiziert)
+// 1 = Chime entkoppeln — wird bewusst nicht implementiert
+#define REOLINK_DINGDONG_GET     2
+#define REOLINK_DINGDONG_SET     3
+#define REOLINK_DINGDONG_PLAY    4
 
 struct ReoLinkAiState
 {
@@ -88,26 +95,35 @@ class ReoLinkCamera
     // SET day/night mode (0=auto, 1=day, 2=night)
     bool setDayNightMode(uint8_t mode);
 
-    // SET motion detection active
-    bool setMotionDetect(bool on);
+    // SET Bewegungsempfindlichkeit in Prozent (100 = maximal empfindlich)
+    bool setMotionSensitivity(uint8_t percent);
 
     // SET auto tracking
     bool setAutoTracking(bool on);
 
     // Doorbell: DingDong options
     bool setDoNotDisturb(bool on);
-    bool setBellLedMode(uint8_t mode);
+    bool setBellLedMode(bool on);
     bool setAutoReply(uint8_t index);
 
     // Chime options (DingDongOpt)
+    // Chime-Id und Zustand werden zur Laufzeit ermittelt (GetDingDongList + option 2)
+    bool getChimeInfo();
     bool setChimeMute(bool muted);
-    bool setChimeVolume(uint8_t volume);
-    bool setChimeRingtone(uint8_t ringtone);
+    bool setChimeVolume(uint8_t volume);   // 0..4
+    bool setChimeRingtone(uint8_t ringtone); // 0..9, gilt für triggerChime()
     bool triggerChime();
+
+    // Fähigkeiten für den ETS-Assistenten ermitteln (GetAbility + GetAiState).
+    // featureBits: Bit0 Flutlicht, 1 Sirene, 2 PTZ, 3 IR, 4 Privatzone,
+    //              5 Aufzeichnung, 6 Auto-Tracking, 7 IO-Eingang
+    // aiBits:      Bit0 Person, 1 Fahrzeug, 2 Tier, 3 Paket, 4 Gesicht
+    bool getAbility(uint8_t& featureBits, uint8_t& aiBits);
 
     // Battery and WiFi info
     bool getBatteryInfo(int8_t& levelOut, int8_t& statusOut, bool& sleepingOut);
-    bool getWifiSignal(int8_t& rssiOut);
+    // Signalstärke 0..100 (kein dBm), -1 = unbekannt
+    bool getWifiSignal(int8_t& signalOut);
 
   private:
     char _ip[REOLINK_MAX_URL_LEN] = {};
@@ -118,6 +134,16 @@ class ReoLinkCamera
 
     char _token[REOLINK_MAX_TOKEN_LEN] = {};
     uint32_t _tokenTimestamp = 0;
+
+    // Chime-Zustand (0 = kein Chime gekoppelt)
+    int32_t _chimeId = 0;
+    char    _chimeName[REOLINK_MAX_CHIME_NAME] = {};
+    uint8_t _chimeVolume = 4;  // zuletzt gesetzte Lautstärke, für Unmute
+    bool    _chimeLed    = true;
+    uint8_t _chimeTone   = 1;  // ChimeToneEnum, Vorgabe "originaltune"
+
+    // DingDongOpt option 3 mit vollständigem Parametersatz senden
+    bool sendChimeOption(uint8_t volume, bool led);
 
     // Build base URL into buffer
     void buildBaseUrl(char* buf, size_t bufLen) const;

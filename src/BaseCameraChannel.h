@@ -23,7 +23,7 @@
 #define IPC_KoFaceDetected       14
 #define IPC_KoIOAlarm            15
 #define IPC_KoPtzPreset          16
-#define IPC_KoMotionDetectActive 17
+#define IPC_KoMotionSensitivity  17
 #define IPC_KoIrLeds             18
 #define IPC_KoDayNightState      19
 #define IPC_KoDayNightMode       20
@@ -58,6 +58,7 @@
 #define IPC_KoBlockSize          37
 
 // Hold time defaults (ms)
+#define IPC_SNAPSHOT_TIMEOUT_MS   3000   // kurz halten: der Aufruf blockiert den loop()
 #define IPC_HOLD_TIME_DEFAULT_MS  (30UL * 1000UL)
 #define IPC_STARTUP_DELAY_MS      (15UL * 1000UL)
 #define IPC_STARTUP_STAGGER_MS    (5UL  * 1000UL)  // zusätzliche Verzögerung pro Kanal-Index
@@ -104,6 +105,9 @@ class BaseCameraChannel : public OpenKNX::Channel
     char _camIp[80]   = {};
     char _camUser[32] = {};
     char _camPass[32] = {};
+
+    // Wird bei Alarm einmalig per HTTP GET aufgerufen (leer = deaktiviert)
+    char _snapshotUrl[80] = {};
 
 #ifdef ARDUINO_ARCH_ESP32
     OnvifClient  _onvifClient;
@@ -170,6 +174,9 @@ class BaseCameraChannel : public OpenKNX::Channel
     // Login / Verbindungsaufbau; gibt true zurück bei Erfolg
     virtual bool login() = 0;
 
+    // Fähigkeiten für den ETS-Assistenten; false wenn nicht unterstützt/erreichbar
+    virtual bool queryAbility(uint8_t& featureBits, uint8_t& aiBits) { return false; }
+
     // Callback: ONVIF-Ereignis empfangen (ESP32 only)
     // topic = kurzer Topic-Name (z.B. "Motion", "Visitor", "MotionAlarm")
     virtual void onOnvifEvent(const char* topic, bool state) {}
@@ -187,11 +194,11 @@ class BaseCameraChannel : public OpenKNX::Channel
     virtual void setPtzPreset(uint8_t preset) {}
     virtual void setIrLeds(bool on) {}
     virtual void setDayNightMode(uint8_t mode) {}
-    virtual void setMotionDetectActive(bool on) {}
+    virtual void setMotionSensitivity(uint8_t percent) {}
     virtual void setAutoTracking(bool on) {}
     virtual void setManualRecord(bool on) {}
     virtual void setDoNotDisturb(bool on) {}
-    virtual void setBellLedMode(uint8_t mode) {}
+    virtual void setBellLedMode(bool on) {}
     virtual void setAutoReply(uint8_t index) {}
     virtual void setChimeMute(bool muted) {}
     virtual void setChimeVolume(uint8_t volume) {}

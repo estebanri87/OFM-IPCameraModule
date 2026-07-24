@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <?xml-model href="../../Organization/knxprod-support/knx_project_14/knx-editor.xsd" type="application/xml" schematypens="http://www.w3.org/2001/XMLSchema"?>
 <KNX xmlns:op="http://github.com/OpenKNX/OpenKNXproducer" xmlns="http://knx.org/xml/project/14" CreatedBy="KNX MT" ToolVersion="5.1.255.16695">
-  <op:config name="%IPC_NumChannelsDefault%" value="0" />
+  <op:config name="%IPC_NumChannelsDefault%" value="2" />
   <ManufacturerData>
     <Manufacturer>
       <ApplicationPrograms>
@@ -69,7 +69,15 @@
               </ParameterType>
               <ParameterType Id="%AID%_PT-IPCPort" Name="IPCPort">
                 <TypeNumber SizeInBit="16" Type="unsignedInt" minInclusive="1" maxInclusive="65535" />
-              </ParameterType>            </ParameterTypes>
+              </ParameterType>
+              <!-- Ausstattungs-Haken; wird vom Assistenten aus GetAbility befüllt -->
+              <ParameterType Id="%AID%_PT-IPCCheck" Name="IPCCheck">
+                <TypeRestriction Base="Value" SizeInBit="1">
+                  <Enumeration Text="Nein" Value="0" Id="%AID%_PT-IPCCheck_EN-0" />
+                  <Enumeration Text="Ja"   Value="1" Id="%AID%_PT-IPCCheck_EN-1" />
+                </TypeRestriction>
+              </ParameterType>
+            </ParameterTypes>
             <Parameters>
               <Union SizeInBit="8">
                 <Memory CodeSegment="%MID%" Offset="0" BitOffset="0" />
@@ -81,6 +89,9 @@
             </ParameterRefs>
             <ComObjectTable />
             <ComObjectRefs />
+            <Script>
+              <op:include href="IPCameraModule.script.js" type="script" />
+            </Script>
           </Static>
           <Dynamic>
             <Channel Name="MainChannel%TT%" Text="IP Kamera" Number="%PREFIX%" Id="%AID%_CH-%TT%" Icon="movie-open-outline">

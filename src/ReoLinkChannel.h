@@ -16,6 +16,9 @@ class ReoLinkChannel : public BaseCameraChannel
     // ONVIF event callback (ESP32 only)
     void onOnvifEvent(const char* topic, bool state) override;
 
+    // Aktuelle Werte der Status-KOs einmalig aktiv senden
+    void sendInitialState() override;
+
     void setSiren(bool on) override;
     void setFloodlight(bool on) override;
     void setPrivacy(bool on) override;

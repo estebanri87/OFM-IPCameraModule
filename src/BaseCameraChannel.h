@@ -145,8 +145,15 @@ class BaseCameraChannel : public OpenKNX::Channel
 
     uint32_t _holdTimeMs = IPC_HOLD_TIME_DEFAULT_MS;
 
+    // Einmalig nach dem ersten erfolgreichen Poll die aktuellen Werte senden,
+    // damit sie im Bus sichtbar sind, statt erst bei der ersten Änderung.
+    bool _initialSent = false;
+
     // Hilfsmethode: KO-Wert setzen (bool, DPT 1)
     void setKoBool(uint8_t koIndex, bool value);
+
+    // KO-Wert unbedingt senden (auch wenn unverändert)
+    void sendKoBool(uint8_t koIndex, bool value);
 
     // Hold-Timer aktualisieren und KO bei Ablauf zurücksetzen
     void processHoldTimer(uint32_t& timer, uint8_t koIndex);
@@ -159,6 +166,9 @@ class BaseCameraChannel : public OpenKNX::Channel
 
     // Sende SnapshotTrigger (KO 36) bei neuem Kamera-Ereignis
     void triggerSnapshot();
+
+    // Aktuelle Werte der Ausgangs-KOs einmalig aktiv senden (herstellerspezifisch)
+    virtual void sendInitialState() {}
 
   public:
     explicit BaseCameraChannel(uint8_t channelIndex);

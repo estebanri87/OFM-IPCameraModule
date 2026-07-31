@@ -87,6 +87,11 @@ void BaseCameraChannel::loop()
     // ONVIF-only mode: JSON polling disabled
     if (_connectionMode == IPC_MODE_ONVIF_ONLY)
     {
+        if (!_initialSent)
+        {
+            sendInitialState();
+            _initialSent = true;
+        }
         processHoldTimers();
         _firstPoll = false;  // mark startup done
         return;
@@ -117,7 +122,14 @@ void BaseCameraChannel::loop()
     if (!pollEvents())
         setOnline(false);
     else
+    {
         setOnline(true);
+        if (!_initialSent)
+        {
+            sendInitialState();
+            _initialSent = true;
+        }
+    }
 
     processHoldTimers();
 }
@@ -192,6 +204,13 @@ void BaseCameraChannel::setKoBool(uint8_t koIndex, bool value)
     bool current = (bool)ko.value(DPT_Switch);
     if (current != value)
         ko.value(value, DPT_Switch);
+}
+
+void BaseCameraChannel::sendKoBool(uint8_t koIndex, bool value)
+{
+    // Unbedingt senden (im Gegensatz zu setKoBool), z.B. für die Erstausgabe
+    GroupObject& ko = knx.getGroupObject(IPC_KoCalcNumber(koIndex));
+    ko.value(value, DPT_Switch);
 }
 
 void BaseCameraChannel::processHoldTimer(uint32_t& timer, uint8_t koIndex)

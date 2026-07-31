@@ -173,6 +173,24 @@ void ReoLinkChannel::setChimeVolume(uint8_t v) { _camera.setChimeVolume(v); }
 void ReoLinkChannel::setChimeRingtone(uint8_t r){ _camera.setChimeRingtone(r); }
 void ReoLinkChannel::triggerChime()            { _camera.triggerChime(); }
 
+void ReoLinkChannel::sendInitialState()
+{
+    // Aktuellen Wert jedes Status-KOs einmal aktiv senden, damit im Bus nicht
+    // erst bei der ersten Änderung ein Wert erscheint.
+    static const uint8_t bools[] = {
+        IPC_KoOnline, IPC_KoMotion, IPC_KoAnyAlarm, IPC_KoPersonDetected,
+        IPC_KoVehicleDetected, IPC_KoAnimalDetected, IPC_KoPetDetected,
+        IPC_KoPackageDetected, IPC_KoBabyAlarm, IPC_KoFaceDetected,
+        IPC_KoIOAlarm, IPC_KoDoorbellTrigger, IPC_KoDoorbellHold,
+        IPC_KoCameraSleeping, IPC_KoPushActive};
+
+    for (uint8_t i = 0; i < sizeof(bools); i++)
+    {
+        GroupObject& ko = knx.getGroupObject(IPC_KoCalcNumber(bools[i]));
+        sendKoBool(bools[i], (bool)ko.value(DPT_Switch));
+    }
+}
+
 void ReoLinkChannel::onOnvifEvent(const char* topic, bool state)
 {
     // Map Reolink ONVIF topics to KOs

@@ -201,7 +201,15 @@ void ReoLinkChannel::onOnvifEvent(const char* topic, bool state)
     // Map Reolink ONVIF topics to KOs
     if (strstr(topic, "Visitor"))
     {
-        if (state) { setKoBool(IPC_KoDoorbellTrigger, true); _holdTimerDoorbell = millis(); }
+        // KO 24 (Status) folgt dem Tastenzustand (true beim Drücken, false beim
+        // Loslassen). KO 23 (Auslöser) ist ein einzelner Puls, damit auch ein
+        // erneutes Klingeln wieder auslöst.
+        setKoBool(IPC_KoDoorbellHold, state);
+        if (state)
+        {
+            setKoBool(IPC_KoDoorbellTrigger, true);
+            setKoBool(IPC_KoDoorbellTrigger, false);
+        }
     }
     else if (strstr(topic, "Motion") || strstr(topic, "MotionAlarm"))
     {

@@ -235,7 +235,8 @@ void BaseCameraChannel::processHoldTimers()
     processHoldTimer(_holdTimerBaby,     IPC_KoBabyAlarm);
     processHoldTimer(_holdTimerFace,     IPC_KoFaceDetected);
     processHoldTimer(_holdTimerIO,       IPC_KoIOAlarm);
-    processHoldTimer(_holdTimerDoorbell, IPC_KoDoorbellHold);
+    // Türklingel: KO 24 folgt direkt dem ONVIF-Zustand, KO 23 ist ein Puls —
+    // beide brauchen keinen Hold-Timer.
 }
 
 void BaseCameraChannel::setOnline(bool online)

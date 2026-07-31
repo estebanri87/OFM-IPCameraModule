@@ -79,6 +79,11 @@ bool ReoLinkChannel::pollEvents()
     applyAiState(ai);
     updateAnyAlarm(ai, motion);
 
+    // Push-Status zurücklesen (KO 7 ist bidirektional)
+    bool pushOn = false;
+    if (_camera.getPush(pushOn))
+        setKoBool(IPC_KoPushActive, pushOn);
+
     // Battery info (if applicable)
     if (_battery)
     {

@@ -2,8 +2,14 @@
 
 OpenKNX-Modul zur Integration von IP-Kameras in den KNX-Bus. Unterstützt bidirektionale Steuerung und Ereignismeldungen.
 
+Die Bedienung in der ETS beschreibt die [Applikationsbeschreibung](doc/Applikationsbeschreibung-IPCamera.md).
+
 ## Release Notes
 
+Die vollständige Historie liegt in [CHANGELOG.md](CHANGELOG.md).
+
+- 0.3.0 Kanalauswahl nach OpenKNX-Standard (**nicht abwärtskompatibel**), Applikationsbeschreibung und ETS-Hilfetexte
+- 0.2.0 ONVIF (Long Poll), Hikvision/Dahua (experimentell), Assistent „Kamera auslesen", überarbeitete ETS-Parameter
 - 0.1.0 Initial Release: Unterstützung für Reolink-Kameras (Bewegung, KI-Erkennung, Türklingel, Klingelton, Sirene, Flutlicht, PTZ, Datenschutz, Push), 8 Kanäle, NVR-Kanalindex
 
 ## Unterstützte Hersteller
@@ -48,7 +54,7 @@ In das Anwendungs-XML muss das OFM-IPCameraModule aufgenommen werden:
     template="../lib/OFM-IPCameraModule/src/IPCameraModule.templ.xml"
     NumChannels="8"
     KoOffset="100">
-    <op:verify File="../lib/OFM-IPCameraModule/library.json" ModuleVersion="0.1" />
+    <op:verify File="../lib/OFM-IPCameraModule/library.json" ModuleVersion="0.3" />
   </op:define>
 ```
 

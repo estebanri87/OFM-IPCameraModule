@@ -1,15 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <?xml-model href="../../Organization/knxprod-support/knx_project_14/knx-editor.xsd" type="application/xml" schematypens="http://www.w3.org/2001/XMLSchema"?>
 <KNX xmlns:op="http://github.com/OpenKNX/OpenKNXproducer" xmlns="http://knx.org/xml/project/14" CreatedBy="KNX MT" ToolVersion="5.1.255.16695">
-  <op:config name="%IPC_NumChannelsDefault%" value="2" />
   <ManufacturerData>
     <Manufacturer>
       <ApplicationPrograms>
         <ApplicationProgram>
           <Static>
             <ParameterTypes>
-              <ParameterType Id="%AID%_PT-IPCNumChannels" Name="IPCNumChannels">
-                <TypeNumber SizeInBit="8" Type="unsignedInt" minInclusive="0" maxInclusive="%N%" />
+              <!-- Kanalauswahl: Kamera deaktiviert/aktiviert (1 Bit, ETS zeigt Radio-Buttons) -->
+              <ParameterType Id="%AID%_PT-IPCChannelActive" Name="IPCChannelActive">
+                <TypeRestriction Base="Value" SizeInBit="1">
+                  <Enumeration Text="Deaktiviert" Value="0" Id="%AID%_PT-IPCChannelActive_EN-0" />
+                  <Enumeration Text="Aktiviert"   Value="1" Id="%AID%_PT-IPCChannelActive_EN-1" />
+                </TypeRestriction>
               </ParameterType>
               <ParameterType Id="%AID%_PT-IPCManufacturer" Name="IPCManufacturer">
                 <TypeRestriction Base="Value" SizeInBit="8">
@@ -78,15 +81,8 @@
                 </TypeRestriction>
               </ParameterType>
             </ParameterTypes>
-            <Parameters>
-              <Union SizeInBit="8">
-                <Memory CodeSegment="%MID%" Offset="0" BitOffset="0" />
-                <Parameter Id="%AID%_UP-%TT%00000" Name="IPCVisibleChannels" ParameterType="%AID%_PT-IPCNumChannels" Offset="0" BitOffset="0" Text="Aktive Kameras" Value="%IPC_NumChannelsDefault%" SuffixText=" von %N%" />
-              </Union>
-            </Parameters>
-            <ParameterRefs>
-              <ParameterRef Id="%AID%_UP-%TT%00000_R-%TT%0000001" RefId="%AID%_UP-%TT%00000" />
-            </ParameterRefs>
+            <Parameters />
+            <ParameterRefs />
             <ComObjectTable />
             <ComObjectRefs />
             <Script>
@@ -95,27 +91,38 @@
           </Static>
           <Dynamic>
             <Channel Name="MainChannel%TT%" Text="IP Kamera" Number="%PREFIX%" Id="%AID%_CH-%TT%" Icon="movie-open-outline">
-              <ParameterBlock Id="%AID%_PB-nnn" Name="IPCSettings" Text="Allgemein" Icon="cog-outline">
+              <ParameterBlock Id="%AID%_PB-nnn" Name="IPCSettings" Text="Allgemein" Icon="cog-outline" HelpContext="IPC-Allgemein">
                 <ParameterSeparator Id="%AID%_PS-nnn" Text="IP Kamera" UIHint="Headline" />
                 <ParameterSeparator Id="%AID%_PS-nnn" Text="Version: %ModuleVersion%" />
-                <ParameterSeparator Id="%AID%_PS-nnn" Text="" UIHint="HorizontalRuler" />
-                <ParameterSeparator Id="%AID%_PS-nnn" Text="Kanalauswahl" UIHint="Headline" />
-                <ParameterRefRef IndentLevel="1" RefId="%AID%_UP-%TT%00000_R-%TT%0000001" />
-                <ParameterSeparator Id="%AID%_PS-nnn" Text="" UIHint="HorizontalRuler" />
               </ParameterBlock>
-              <op:include href="IPCameraModule.templ.xml" xpath="//Dynamic/ChannelIndependentBlock/*" type="template" prefix="IPC" IsInner="true" />
-              <choose ParamRefId="%AID%_UP-%TT%00000_R-%TT%0000001">
-                <when test="&lt;%N%">
-                  <ParameterBlock Id="%AID%_PB-nnn" Name="IPCAdditionalChannels" Text="(mehr)" Icon="dots-horizontal">
-                    <ParameterSeparator Id="%AID%_PS-nnn" Text="Kanalauswahl" UIHint="Headline" />
-                    <ParameterRefRef RefId="%AID%_UP-%TT%00000_R-%TT%0000001" />
-                  </ParameterBlock>
-                </when>
-              </choose>
+              <!-- Kanalauswahl: je Kamera eine einzeilige Tabelle (OpenKNX-Standard) -->
+              <ParameterBlock Id="%AID%_PB-nnn" Name="IPCChannelSelect" Text="Kanalauswahl" Icon="format-list-bulleted-type" HelpContext="BASE-ChannelSelect">
+                <ParameterBlock Id="%AID%_PB-nnn" Inline="true" Layout="Grid">
+                  <Rows>
+                    <Row Id="%AID%_PB-nnn_R-1" />
+                  </Rows>
+                  <Columns>
+                    <Column Id="%AID%_PB-nnn_C-1" Width="15%" />
+                    <Column Id="%AID%_PB-nnn_C-2" Width="35%" />
+                    <Column Id="%AID%_PB-nnn_C-3" Width="50%" />
+                  </Columns>
+                  <ParameterSeparator Id="%AID%_PS-nnn" Cell="1,1" UIHint="Headline" Text="Kanal" />
+                  <ParameterSeparator Id="%AID%_PS-nnn" Cell="1,2" UIHint="Headline" Text="Kanalaktivität" />
+                  <ParameterSeparator Id="%AID%_PS-nnn" Cell="1,3" UIHint="Headline" Text="Beschreibung" />
+                </ParameterBlock>
+                <op:include href="IPCameraModule.templ.xml" xpath="//Dynamic/ChannelIndependentBlock/ParameterBlock[@Name='Settings']/*" type="template" prefix="IPC" IsInner="true" />
+              </ParameterBlock>
+              <!-- Kamera-Tabs (nur aktivierte Kameras) -->
+              <op:include href="IPCameraModule.templ.xml" xpath="//Dynamic/ChannelIndependentBlock/ParameterBlock[@Name='Channel']/*" type="template" prefix="IPC" IsInner="true" />
             </Channel>
           </Dynamic>
         </ApplicationProgram>
       </ApplicationPrograms>
+      <Baggages>
+        <Baggage TargetPath="" Name="Help_de.zip" Id="%FILE-HELP-de%">
+          <FileInfo TimeInfo="%DATETIME%" />
+        </Baggage>
+      </Baggages>
     </Manufacturer>
   </ManufacturerData>
 </KNX>

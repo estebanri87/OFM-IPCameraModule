@@ -7,8 +7,8 @@
         <ApplicationProgram>
           <Static>
             <Parameters>
-              <!-- Kanal-Bezeichnung -->
-              <Parameter Id="%AID%_P-%TT%%CC%000" Name="Channel%C%Name" ParameterType="%AID%_PT-Text40Byte" Text="Bezeichnung" Value="" />
+              <!-- Kanal-Beschreibung -->
+              <Parameter Id="%AID%_P-%TT%%CC%000" Name="Channel%C%Name" ParameterType="%AID%_PT-Text40Byte" Text="Beschreibung" Value="" />
 
               <!-- Hersteller (Byte 0) -->
               <Union SizeInBit="8">
@@ -140,6 +140,12 @@
                 <Parameter Id="%AID%_UP-%TT%%CC%039" Name="CH%C%KoChimeRingtone" ParameterType="%AID%_PT-IPCCheck" Offset="0" BitOffset="5" Text="Chime Klingelton" Value="1" />
                 <Parameter Id="%AID%_UP-%TT%%CC%040" Name="CH%C%KoChimeTrigger"  ParameterType="%AID%_PT-IPCCheck" Offset="0" BitOffset="6" Text="Chime auslösen" Value="1" />
               </Union>
+
+              <!-- Kanalauswahl: Kamera aktiviert (Byte 305) -->
+              <Union SizeInBit="8">
+                <Memory CodeSegment="%MID%" Offset="305" BitOffset="0" />
+                <Parameter Id="%AID%_UP-%TT%%CC%041" Name="CH%C%Active" ParameterType="%AID%_PT-IPCChannelActive" Offset="0" BitOffset="0" Text="Kanalaktivität" Value="0" />
+              </Union>
             </Parameters>
 
             <ParameterRefs>
@@ -182,6 +188,7 @@
               <ParameterRef Id="%AID%_UP-%TT%%CC%038_R-%TT%%CC%03801" RefId="%AID%_UP-%TT%%CC%038" />
               <ParameterRef Id="%AID%_UP-%TT%%CC%039_R-%TT%%CC%03901" RefId="%AID%_UP-%TT%%CC%039" />
               <ParameterRef Id="%AID%_UP-%TT%%CC%040_R-%TT%%CC%04001" RefId="%AID%_UP-%TT%%CC%040" />
+              <ParameterRef Id="%AID%_UP-%TT%%CC%041_R-%TT%%CC%04101" RefId="%AID%_UP-%TT%%CC%041" />
             </ParameterRefs>
 
             <ComObjectTable>
@@ -341,37 +348,55 @@
 
           <Dynamic>
             <ChannelIndependentBlock>
-              <!-- Kanalanzahl steuert Sichtbarkeit -->
-              <choose ParamRefId="%AID%_UP-%TT%00000_R-%TT%0000001">
-                <when test="&gt;=%C%">
-                  <ParameterBlock Id="%AID%_PB-nnn" Name="f%CC%IPC" Text="Kamera %C%: {{0: ...}}" TextParameterRefId="%AID%_P-%TT%%CC%000_R-%TT%%CC%00001" Icon="movie-open-outline" ShowInComObjectTree="true">
+              <!-- Zeile der Kanalauswahl-Tabelle (eine einzeilige Tabelle je Kanal) -->
+              <ParameterBlock Id="%AID%_PB-nnn" Name="Settings">
+                <ParameterBlock Id="%AID%_PB-nnn" Inline="true" Layout="Grid">
+                  <Rows>
+                    <Row Id="%AID%_PB-nnn_R-1" />
+                  </Rows>
+                  <Columns>
+                    <Column Id="%AID%_PB-nnn_C-1" Width="15%" />
+                    <Column Id="%AID%_PB-nnn_C-2" Width="35%" />
+                    <Column Id="%AID%_PB-nnn_C-3" Width="50%" />
+                  </Columns>
+                  <ParameterSeparator Id="%AID%_PS-nnn" Cell="1,1" Text="Kamera %C%" />
+                  <ParameterRefRef RefId="%AID%_UP-%TT%%CC%041_R-%TT%%CC%04101" Cell="1,2" HelpContext="BASE-ChannelSelect" />
+                  <!-- Beschreibung bleibt auch bei Deaktiviert sichtbar -->
+                  <ParameterRefRef RefId="%AID%_P-%TT%%CC%000_R-%TT%%CC%00001" Cell="1,3" HelpContext="BASE-ChannelName" />
+                </ParameterBlock>
+              </ParameterBlock>
 
-                    <ParameterSeparator Id="%AID%_PS-nnn" Text="Kamera %C%" UIHint="Headline" />
-                    <ParameterRefRef RefId="%AID%_P-%TT%%CC%000_R-%TT%%CC%00001" />
-                    <ParameterSeparator Id="%AID%_PS-nnn" Text="" UIHint="HorizontalRuler" />
+              <!-- Kamera-Tab (nur aktivierte Kameras) -->
+              <ParameterBlock Id="%AID%_PB-nnn" Name="Channel">
+              <choose ParamRefId="%AID%_UP-%TT%%CC%041_R-%TT%%CC%04101">
+                <when test="=1">
+                  <ParameterBlock Id="%AID%_PB-nnn" Name="f%CC%IPC" Text="Kamera %C%: {{0: ...}}" TextParameterRefId="%AID%_P-%TT%%CC%000_R-%TT%%CC%00001" Icon="movie-open-outline" ShowInComObjectTree="true" HelpContext="IPC-Kamera">
+
+                    <ParameterSeparator Id="%AID%_PS-nnn" Text="Kanaldefinition" UIHint="Headline" />
+                    <ParameterRefRef RefId="%AID%_P-%TT%%CC%000_R-%TT%%CC%00001" HelpContext="BASE-ChannelName" />
 
                     <!-- Gerät und Verbindung -->
                     <ParameterSeparator Id="%AID%_PS-nnn" Text="Gerät" UIHint="Headline" />
-                    <ParameterRefRef RefId="%AID%_UP-%TT%%CC%001_R-%TT%%CC%00101" />
-                    <ParameterRefRef RefId="%AID%_UP-%TT%%CC%002_R-%TT%%CC%00201" />
-                    <ParameterRefRef RefId="%AID%_UP-%TT%%CC%003_R-%TT%%CC%00301" />
+                    <ParameterRefRef RefId="%AID%_UP-%TT%%CC%001_R-%TT%%CC%00101" HelpContext="IPC-Hersteller" />
+                    <ParameterRefRef RefId="%AID%_UP-%TT%%CC%002_R-%TT%%CC%00201" HelpContext="IPC-Geraetetyp" />
+                    <ParameterRefRef RefId="%AID%_UP-%TT%%CC%003_R-%TT%%CC%00301" HelpContext="IPC-Verbindungstyp" />
                     <!-- Chime nur bei Türklingel -->
                     <choose ParamRefId="%AID%_UP-%TT%%CC%002_R-%TT%%CC%00201">
                       <when test="=1">
-                        <ParameterRefRef RefId="%AID%_UP-%TT%%CC%005_R-%TT%%CC%00501" />
+                        <ParameterRefRef RefId="%AID%_UP-%TT%%CC%005_R-%TT%%CC%00501" HelpContext="IPC-Chime" />
                       </when>
                     </choose>
 
                     <!-- Verbindung -->
                     <ParameterSeparator Id="%AID%_PS-nnn" Text="Verbindung" UIHint="Headline" />
-                    <ParameterRefRef RefId="%AID%_UP-%TT%%CC%010_R-%TT%%CC%01001" />
-                    <ParameterRefRef RefId="%AID%_UP-%TT%%CC%017_R-%TT%%CC%01701" />
-                    <ParameterRefRef RefId="%AID%_UP-%TT%%CC%011_R-%TT%%CC%01101" />
-                    <ParameterRefRef RefId="%AID%_UP-%TT%%CC%012_R-%TT%%CC%01201" />
+                    <ParameterRefRef RefId="%AID%_UP-%TT%%CC%010_R-%TT%%CC%01001" HelpContext="IPC-Verbindung" />
+                    <ParameterRefRef RefId="%AID%_UP-%TT%%CC%017_R-%TT%%CC%01701" HelpContext="IPC-Verbindung" />
+                    <ParameterRefRef RefId="%AID%_UP-%TT%%CC%011_R-%TT%%CC%01101" HelpContext="IPC-Verbindung" />
+                    <ParameterRefRef RefId="%AID%_UP-%TT%%CC%012_R-%TT%%CC%01201" HelpContext="IPC-Verbindung" />
                     <!-- NVR-Kanal-Index nur bei NVR -->
                     <choose ParamRefId="%AID%_UP-%TT%%CC%002_R-%TT%%CC%00201">
                       <when test="=2">
-                        <ParameterRefRef RefId="%AID%_UP-%TT%%CC%008_R-%TT%%CC%00801" />
+                        <ParameterRefRef RefId="%AID%_UP-%TT%%CC%008_R-%TT%%CC%00801" HelpContext="IPC-NVR-Kanal" />
                       </when>
                     </choose>
 
@@ -381,48 +406,47 @@
                     <Button Id="%AID%_B-%TT%%CC%001" Text="Kamera auslesen"
                             EventHandler="IPC_readAbility" EventHandlerOnline="ConnectionOriented"
                             EventHandlerParameters="{ &quot;channel&quot;:%C% }" />
-                    <ParameterRefRef RefId="%AID%_UP-%TT%%CC%031_R-%TT%%CC%03101" />
-                    <ParameterRefRef RefId="%AID%_UP-%TT%%CC%018_R-%TT%%CC%01801" />
-                    <ParameterRefRef RefId="%AID%_UP-%TT%%CC%019_R-%TT%%CC%01901" />
-                    <ParameterRefRef RefId="%AID%_UP-%TT%%CC%020_R-%TT%%CC%02001" />
-                    <ParameterRefRef RefId="%AID%_UP-%TT%%CC%021_R-%TT%%CC%02101" />
-                    <ParameterRefRef RefId="%AID%_UP-%TT%%CC%022_R-%TT%%CC%02201" />
-                    <ParameterRefRef RefId="%AID%_UP-%TT%%CC%023_R-%TT%%CC%02301" />
-                    <ParameterRefRef RefId="%AID%_UP-%TT%%CC%024_R-%TT%%CC%02401" />
-                    <ParameterRefRef RefId="%AID%_UP-%TT%%CC%025_R-%TT%%CC%02501" />
-                    <ParameterRefRef RefId="%AID%_UP-%TT%%CC%032_R-%TT%%CC%03201" />
-                    <ParameterRefRef RefId="%AID%_UP-%TT%%CC%033_R-%TT%%CC%03301" />
+                    <ParameterRefRef RefId="%AID%_UP-%TT%%CC%031_R-%TT%%CC%03101" HelpContext="IPC-Ausstattung" />
+                    <ParameterRefRef RefId="%AID%_UP-%TT%%CC%018_R-%TT%%CC%01801" HelpContext="IPC-Ausstattung" />
+                    <ParameterRefRef RefId="%AID%_UP-%TT%%CC%019_R-%TT%%CC%01901" HelpContext="IPC-Ausstattung" />
+                    <ParameterRefRef RefId="%AID%_UP-%TT%%CC%020_R-%TT%%CC%02001" HelpContext="IPC-Ausstattung" />
+                    <ParameterRefRef RefId="%AID%_UP-%TT%%CC%021_R-%TT%%CC%02101" HelpContext="IPC-Ausstattung" />
+                    <ParameterRefRef RefId="%AID%_UP-%TT%%CC%022_R-%TT%%CC%02201" HelpContext="IPC-Ausstattung" />
+                    <ParameterRefRef RefId="%AID%_UP-%TT%%CC%023_R-%TT%%CC%02301" HelpContext="IPC-Ausstattung" />
+                    <ParameterRefRef RefId="%AID%_UP-%TT%%CC%024_R-%TT%%CC%02401" HelpContext="IPC-Ausstattung" />
+                    <ParameterRefRef RefId="%AID%_UP-%TT%%CC%025_R-%TT%%CC%02501" HelpContext="IPC-Ausstattung" />
+                    <ParameterRefRef RefId="%AID%_UP-%TT%%CC%032_R-%TT%%CC%03201" HelpContext="IPC-Ausstattung" />
+                    <ParameterRefRef RefId="%AID%_UP-%TT%%CC%033_R-%TT%%CC%03301" HelpContext="IPC-Ausstattung" />
                     <ParameterSeparator Id="%AID%_PS-nnn" Text="KI-Erkennung" UIHint="Headline" />
-                    <ParameterRefRef RefId="%AID%_UP-%TT%%CC%026_R-%TT%%CC%02601" />
-                    <ParameterRefRef RefId="%AID%_UP-%TT%%CC%027_R-%TT%%CC%02701" />
-                    <ParameterRefRef RefId="%AID%_UP-%TT%%CC%028_R-%TT%%CC%02801" />
-                    <ParameterRefRef RefId="%AID%_UP-%TT%%CC%029_R-%TT%%CC%02901" />
-                    <ParameterRefRef RefId="%AID%_UP-%TT%%CC%030_R-%TT%%CC%03001" />
+                    <ParameterRefRef RefId="%AID%_UP-%TT%%CC%026_R-%TT%%CC%02601" HelpContext="IPC-KI-Erkennung" />
+                    <ParameterRefRef RefId="%AID%_UP-%TT%%CC%027_R-%TT%%CC%02701" HelpContext="IPC-KI-Erkennung" />
+                    <ParameterRefRef RefId="%AID%_UP-%TT%%CC%028_R-%TT%%CC%02801" HelpContext="IPC-KI-Erkennung" />
+                    <ParameterRefRef RefId="%AID%_UP-%TT%%CC%029_R-%TT%%CC%02901" HelpContext="IPC-KI-Erkennung" />
+                    <ParameterRefRef RefId="%AID%_UP-%TT%%CC%030_R-%TT%%CC%03001" HelpContext="IPC-KI-Erkennung" />
                     <ParameterSeparator Id="%AID%_PS-nnn" Text="Zusätzliche Objekte (nicht vom Assistenten gesetzt)" UIHint="Headline" />
-                    <ParameterRefRef RefId="%AID%_UP-%TT%%CC%036_R-%TT%%CC%03601" />
-                    <ParameterRefRef RefId="%AID%_UP-%TT%%CC%034_R-%TT%%CC%03401" />
-                    <ParameterRefRef RefId="%AID%_UP-%TT%%CC%035_R-%TT%%CC%03501" />
+                    <ParameterRefRef RefId="%AID%_UP-%TT%%CC%036_R-%TT%%CC%03601" HelpContext="IPC-Zusaetzliche-Objekte" />
+                    <ParameterRefRef RefId="%AID%_UP-%TT%%CC%034_R-%TT%%CC%03401" HelpContext="IPC-Zusaetzliche-Objekte" />
+                    <ParameterRefRef RefId="%AID%_UP-%TT%%CC%035_R-%TT%%CC%03501" HelpContext="IPC-Zusaetzliche-Objekte" />
 
                     <!-- Verbindungsmodus -->
                     <ParameterSeparator Id="%AID%_PS-nnn" Text="ONVIF / Polling" UIHint="Headline" />
-                    <ParameterRefRef RefId="%AID%_UP-%TT%%CC%013_R-%TT%%CC%01301" />
+                    <ParameterRefRef RefId="%AID%_UP-%TT%%CC%013_R-%TT%%CC%01301" HelpContext="IPC-Verbindungsmodus" />
                     <!-- ONVIF-Details nur wenn ONVIF aktiv -->
                     <choose ParamRefId="%AID%_UP-%TT%%CC%013_R-%TT%%CC%01301">
                       <when test="!=0">
                         <ParameterSeparator Id="%AID%_PS-nnn" Text="ONVIF erfordert ESP32 (FreeRTOS). Auf RP2040 bitte JSON Polling verwenden." UIHint="Information" />
-                        <ParameterRefRef RefId="%AID%_UP-%TT%%CC%014_R-%TT%%CC%01401" />
-                        <ParameterRefRef RefId="%AID%_UP-%TT%%CC%015_R-%TT%%CC%01501" />
+                        <ParameterRefRef RefId="%AID%_UP-%TT%%CC%014_R-%TT%%CC%01401" HelpContext="IPC-Verbindungsmodus" />
+                        <ParameterRefRef RefId="%AID%_UP-%TT%%CC%015_R-%TT%%CC%01501" HelpContext="IPC-Verbindungsmodus" />
                       </when>
                     </choose>
-                    <ParameterRefRef RefId="%AID%_UP-%TT%%CC%016_R-%TT%%CC%01601" />
+                    <ParameterRefRef RefId="%AID%_UP-%TT%%CC%016_R-%TT%%CC%01601" HelpContext="IPC-Snapshot-URL" />
 
                     <!-- Timing -->
                     <ParameterSeparator Id="%AID%_PS-nnn" Text="Abfrage" UIHint="Headline" />
-                    <ParameterRefRef RefId="%AID%_UP-%TT%%CC%006_R-%TT%%CC%00601" />
-                    <ParameterRefRef RefId="%AID%_UP-%TT%%CC%007_R-%TT%%CC%00701" />
+                    <ParameterRefRef RefId="%AID%_UP-%TT%%CC%006_R-%TT%%CC%00601" HelpContext="IPC-Abfrage" />
+                    <ParameterRefRef RefId="%AID%_UP-%TT%%CC%007_R-%TT%%CC%00701" HelpContext="IPC-Abfrage" />
 
                     <!-- Basis-KOs: 0/1/2/7 kann jedes Gerät, der Rest hängt an der Ausstattung -->
-                    <ParameterSeparator Id="%AID%_PS-nnn" Text="" UIHint="HorizontalRuler" />
                     <choose ParamRefId="%AID%_UP-%TT%%CC%036_R-%TT%%CC%03601">
                       <when test="=1"><ComObjectRefRef RefId="%AID%_O-%TT%%CC%000_R-%TT%%CC%00001" /></when>
                     </choose>
@@ -503,10 +527,10 @@
                           <when test="=1">
                             <ParameterSeparator Id="%AID%_PS-nnn" Text="Chime-Objekte" UIHint="Headline" />
                             <ParameterSeparator Id="%AID%_PS-nnn" Text="Lautstärke 0-4 (0 = stumm). Klingelton 0-9: 0 citybird, 1 originaltune, 2 pianokey, 3 loop, 4 attraction, 5 hophop, 6 goodday, 7 operetta, 8 moonlight, 9 waybackhome. Der Klingelton gilt für den Auslöser." UIHint="Information" />
-                            <ParameterRefRef RefId="%AID%_UP-%TT%%CC%037_R-%TT%%CC%03701" />
-                            <ParameterRefRef RefId="%AID%_UP-%TT%%CC%038_R-%TT%%CC%03801" />
-                            <ParameterRefRef RefId="%AID%_UP-%TT%%CC%039_R-%TT%%CC%03901" />
-                            <ParameterRefRef RefId="%AID%_UP-%TT%%CC%040_R-%TT%%CC%04001" />
+                            <ParameterRefRef RefId="%AID%_UP-%TT%%CC%037_R-%TT%%CC%03701" HelpContext="IPC-Chime" />
+                            <ParameterRefRef RefId="%AID%_UP-%TT%%CC%038_R-%TT%%CC%03801" HelpContext="IPC-Chime" />
+                            <ParameterRefRef RefId="%AID%_UP-%TT%%CC%039_R-%TT%%CC%03901" HelpContext="IPC-Chime" />
+                            <ParameterRefRef RefId="%AID%_UP-%TT%%CC%040_R-%TT%%CC%04001" HelpContext="IPC-Chime" />
                             <choose ParamRefId="%AID%_UP-%TT%%CC%037_R-%TT%%CC%03701">
                               <when test="=1"><ComObjectRefRef RefId="%AID%_O-%TT%%CC%028_R-%TT%%CC%02801" /></when>
                             </choose>
@@ -548,6 +572,7 @@
                   </ParameterBlock>
                 </when>
               </choose>
+              </ParameterBlock>
             </ChannelIndependentBlock>
           </Dynamic>
 

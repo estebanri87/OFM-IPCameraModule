@@ -32,6 +32,10 @@ void IPCameraModule::showInformations()
 
 OpenKNX::Channel* IPCameraModule::createChannel(uint8_t _channelIndex /* this parameter is used in macros, do not rename */)
 {
+    // Nur aktivierte Kameras anlegen (Kanalauswahl).
+    if (!ParamIPC_CHActive)
+        return nullptr;
+
     // Hersteller-Parameter: 0=Reolink, 1=Hikvision, 2=Dahua
     switch (ParamIPC_CHManufacturer)
     {

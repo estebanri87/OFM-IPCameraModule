@@ -10,6 +10,10 @@
               <!-- Kanal-Beschreibung -->
               <Parameter Id="%AID%_P-%TT%%CC%000" Name="Channel%C%Name" ParameterType="%AID%_PT-Text40Byte" Text="Beschreibung" Value="" />
 
+              <!-- Anzeigename für den Kanal-Tab: Beschreibung, der bei "Suspendiert = Ja"
+                   das Zeichen der Kanalauswahl vorangestellt wird. Nur in der ETS. -->
+              <Parameter Id="%AID%_P-%TT%%CC%998" Name="CH%C%NameDisplay" ParameterType="%AID%_PT-Text45Byte" Text="Beschreibung (Anzeige)" Value="" Access="Read" op:configTransfer="never" />
+
               <!-- Hersteller (Byte 0) -->
               <Union SizeInBit="8">
                 <Memory CodeSegment="%MID%" Offset="0" BitOffset="0" />
@@ -141,10 +145,11 @@
                 <Parameter Id="%AID%_UP-%TT%%CC%040" Name="CH%C%KoChimeTrigger"  ParameterType="%AID%_PT-IPCCheck" Offset="0" BitOffset="6" Text="Chime auslösen" Value="1" />
               </Union>
 
-              <!-- Kanalauswahl: Kamera aktiviert (Byte 305) -->
+              <!-- Kanalauswahl: Kamera aktiviert, Suspendiert (Byte 305) -->
               <Union SizeInBit="8">
                 <Memory CodeSegment="%MID%" Offset="305" BitOffset="0" />
                 <Parameter Id="%AID%_UP-%TT%%CC%041" Name="CH%C%Active" ParameterType="%AID%_PT-IPCChannelActive" Offset="0" BitOffset="0" Text="Kanalaktivität" Value="0" />
+                <Parameter Id="%AID%_UP-%TT%%CC%042" Name="CH%C%Suspended" ParameterType="%AID%_PT-Suspended" Offset="0" BitOffset="1" Text="Suspendiert" Value="0" />
               </Union>
             </Parameters>
 
@@ -189,7 +194,24 @@
               <ParameterRef Id="%AID%_UP-%TT%%CC%039_R-%TT%%CC%03901" RefId="%AID%_UP-%TT%%CC%039" />
               <ParameterRef Id="%AID%_UP-%TT%%CC%040_R-%TT%%CC%04001" RefId="%AID%_UP-%TT%%CC%040" />
               <ParameterRef Id="%AID%_UP-%TT%%CC%041_R-%TT%%CC%04101" RefId="%AID%_UP-%TT%%CC%041" />
+              <ParameterRef Id="%AID%_UP-%TT%%CC%042_R-%TT%%CC%04201" RefId="%AID%_UP-%TT%%CC%042" />
+              <ParameterRef Id="%AID%_P-%TT%%CC%998_R-%TT%%CC%99801"  RefId="%AID%_P-%TT%%CC%998" />
             </ParameterRefs>
+
+            <ParameterCalculations>
+              <!-- Suspendierte Kanäle in der Baumansicht kennzeichnen -->
+              <ParameterCalculation Id="%AID%_PC-%TT%%CC%001" Language="JavaScript" Name="MarkInactive%CC%"
+                                    RLTransformationFunc="BASE_MarkInactiveChannel" RLTransformationParameters="{&quot;InactiveValue&quot;:1}"
+                                    LRTransformationFunc="BASE_Nop">
+                <LParameters>
+                  <ParameterRefRef RefId="%AID%_P-%TT%%CC%998_R-%TT%%CC%99801" AliasName="TextOutput" />
+                </LParameters>
+                <RParameters>
+                  <ParameterRefRef RefId="%AID%_P-%TT%%CC%000_R-%TT%%CC%00001" AliasName="TextInput" />
+                  <ParameterRefRef RefId="%AID%_UP-%TT%%CC%042_R-%TT%%CC%04201" AliasName="InactiveControl" />
+                </RParameters>
+              </ParameterCalculation>
+            </ParameterCalculations>
 
             <ComObjectTable>
               <!-- KO 0: Kamera erreichbar -->
@@ -370,10 +392,11 @@
               <ParameterBlock Id="%AID%_PB-nnn" Name="Channel">
               <choose ParamRefId="%AID%_UP-%TT%%CC%041_R-%TT%%CC%04101">
                 <when test="=1">
-                  <ParameterBlock Id="%AID%_PB-nnn" Name="f%CC%IPC" Text="Kamera %C%: {{0: ...}}" TextParameterRefId="%AID%_P-%TT%%CC%000_R-%TT%%CC%00001" Icon="movie-open-outline" ShowInComObjectTree="true" HelpContext="IPC-Kamera">
+                  <ParameterBlock Id="%AID%_PB-nnn" Name="f%CC%IPC" Text="Kamera %C%: {{0: ...}}" TextParameterRefId="%AID%_P-%TT%%CC%998_R-%TT%%CC%99801" Icon="movie-open-outline" ShowInComObjectTree="true" HelpContext="IPC-Kamera">
 
                     <ParameterSeparator Id="%AID%_PS-nnn" Text="Kanaldefinition" UIHint="Headline" />
                     <ParameterRefRef RefId="%AID%_P-%TT%%CC%000_R-%TT%%CC%00001" HelpContext="BASE-ChannelName" />
+                    <ParameterRefRef RefId="%AID%_UP-%TT%%CC%042_R-%TT%%CC%04201" HelpContext="BASE-ChannelSuspended" />
 
                     <!-- Gerät und Verbindung -->
                     <ParameterSeparator Id="%AID%_PS-nnn" Text="Gerät" UIHint="Headline" />

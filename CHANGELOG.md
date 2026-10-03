@@ -1,5 +1,12 @@
 # Changelog OFM-IPCameraModule
 
+## 0.4.0 - 2026-09-28
+
+### Added
+- Kanal-Parameter **Suspendiert** (Nein/Ja) im Kanaldefinitions-Block jeder Kamera. Die
+  Kamera bleibt vollständig parametriert, wird aber nicht ausgeführt — hilfreich bei der
+  Fehlersuche. Suspendierte Kanäle tragen im ETS-Baum ein **⛔** vor der Beschreibung.
+
 ## 0.3.0 - 2026-09-25
 
 ### Breaking

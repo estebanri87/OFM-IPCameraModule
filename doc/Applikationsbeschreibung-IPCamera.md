@@ -46,6 +46,13 @@ ab.
 
 <!-- DOCEND -->
 
+## Suspendiert
+
+Legt eine fertig parametrierte Kamera still: Der Kanal bleibt mit allen Einstellungen und
+Verknüpfungen erhalten, wird von der Firmware aber nicht angelegt und damit nicht abgefragt.
+Suspendierte Kanäle tragen im ETS-Baum ein ⛔ vor der Beschreibung. Ausführlich beschrieben ist
+der Parameter in der gemeinsamen Hilfeseite *Suspendiert*.
+
 ## Gerät
 
 <!-- DOC -->
